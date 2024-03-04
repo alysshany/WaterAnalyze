@@ -1,0 +1,61 @@
+﻿@page "/monitoring"
+@using Data
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject WaterAnalyzeContext WaterAnalyzeContext
+
+<PageTitle>Главная</PageTitle>
+
+<MudPaper Style="display: block; width: 30%; margin-left: auto; margin-top: 2%; margin-right: auto; ">
+    <MudSpacer />
+    <MudSelect T="string" Label="Отклонения" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+        <MudSelectItem T="string" Value="@("Хлор")" />
+        <MudSelectItem T="string" Value="@("Магний")" />
+        <MudSelectItem T="string" Value="@("xd")" />
+    </MudSelect>
+</MudPaper>
+<div Style="display: flex; width: 70%; height: 18%;margin-left: auto; margin-top: 2%; margin-right: auto; ">
+    <MudCard Style="flex: 70%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+        <div id="map"></div>
+    </MudCard>
+@*     <div Style="flex: 20%; ">
+        <MudSelect T="string" Label="Отклонения" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem T="string" Value="@("Хлор")"  />
+            <MudSelectItem T="string" Value="@("Магний")" />
+            <MudSelectItem T="string" Value="@("xd")" />
+        </MudSelect>
+    </div> *@
+    
+</div>
+
+
+@code {
+    // После того как все элементы DOM веб страницы загружены...
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("startmap", null);
+
+            List<Source> sourceList = WaterAnalyzeContext.Sources.ToList();
+
+            foreach (var source in sourceList)
+            {
+                await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY);
+            }
+        }
+    }
+
+}
+
+<style>
+    #map {
+        width: 1100px;
+        height: 500px;
+        padding: 0;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>

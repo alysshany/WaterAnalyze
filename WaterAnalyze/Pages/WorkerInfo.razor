@@ -1,0 +1,168 @@
+﻿@page "/workerInfo"
+@page "/workerInfo/{workerId}"
+@using Data
+@using Microsoft.JSInterop
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Главная</PageTitle>
+
+<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+	<div Style="flex: 50%;">
+		<MudImage Src='/img/Mesh-73.png' Style="width: 99%; object-fit: fill"></MudImage>
+	</div>
+	<div Style="flex: 50%; ">
+        <MudPaper>
+            <div Class="d-flex mx-auto" style="display: inline-block;">
+                <MudTextField T="String" Label="Фамилия:" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@surname" />
+                <MudTextField T="String" Label="Имя:" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@name" />
+            </div>
+            <MudTextField T="String" Label="Отчество:" Variant="Variant.Outlined" Style=" font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@patronymic" />
+        </MudPaper>
+        <MudPaper>
+            <MudTextField T="String" Label="Логин:" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@login" />
+            <MudTextField T="String" Label="Пароль:" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@password" />
+        </MudPaper>
+        <MudText Style="font-size: 16px; margin: 0">
+            Роль:
+        </MudText>
+        <MudButton Color="Color.Info" Variant="adminVariant">Администратор</MudButton>
+        <MudButton Color="Color.Info" Variant="Variant.Outlined">Лаборант</MudButton>
+        <MudButton Color="Color.Info" Variant="Variant.Outlined">Заведующий</MudButton>
+
+        @if (!newOne)
+        {
+            <div Class="d-flex mx-auto" style="display: inline-block;">
+                <MudButton Variant="Variant.Outlined" Color="Color.Info" Class="d-flex mx-auto" Style="margin: 15px" @onclick="RegistrationLabWorker">
+                    Сохранить
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Info" Class="d-flex mx-auto" Style="margin: 15px" @onclick="DeletingWorker">
+                    Удалить
+                </MudButton>
+            </div>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Info" Class="d-flex mx-auto" Style="margin: 15px" @onclick="RegistrationLabWorker">
+                Сохранить
+            </MudButton>
+        }
+	</div>
+</MudCard>
+
+@* <MudGrid Style="width: 60%; height: 30%;display: block;margin-left: auto;margin-right: auto; margin-top: 2%;">
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    
+</MudGrid> *@
+
+
+@code {
+    [Parameter]
+    public string? workerId { get; set; }
+
+    User user;
+    Variant adminVariant = new Variant();
+    string? surname;
+    string? name;
+    string? patronymic;
+    string? login;
+    string? password;
+    string? role;
+    bool newOne;
+
+    protected override void OnInitialized()
+    {
+        newOne = true;
+
+        if (workerId != null)
+        {
+            user = WaterAnalyzeContext.Users.Where(x => x.Id == Convert.ToInt32(workerId)).First();
+
+            surname = user.Surname;
+            name = user.Name;
+            patronymic = user.Patronymic;
+
+            newOne = false;
+
+            
+        }
+
+        adminVariant = Variant.Filled;
+	}
+
+    public void DeletingWorker()
+    {
+        // DBConnection.DeleteUserFromDataBase(user);
+        // navigation.NavigateTo("/workerslist");
+        // Snackbar.Add("Успешно удалено", Severity.Success);
+    }
+
+    public void RegistrationLabWorker()
+    {
+        // if (workerLogin != null)
+        // {
+        //     if (surname != null && name != null && password != null)
+        //     {
+        //         user.Surname = surname;
+        //         user.Name = name;
+        //         user.Patronymic = patronymic;
+        //         user.Login = login;
+        //         user.Password = password;
+        //         user.RoleName = role;
+        //         DBConnection.ReplaceUser(user);
+
+        //         Snackbar.Add("Изменения сохранены", Severity.Success);
+
+        //         navigation.NavigateTo("/admin");
+        //     }
+        //     else
+        //     {
+        //         Snackbar.Add("Не все поля заполнены корректно.", Severity.Error);
+        //     }
+        // }
+        // else
+        // {
+        //     if (surname != null && name != null && login != null &&
+        //     password != null && role != null && role != "-")
+        //     {
+        //         if (DBConnection.FindUserByLogin(login) == null)
+        //         {
+        //             User userData = new User()
+        //                 {
+        //                     Surname = surname,
+        //                     Name = name,
+        //                     Patronymic = patronymic,
+        //                     Login = login,
+        //                     Password = password,
+        //                     RoleName = role
+        //                 };
+        //             DBConnection.AddToDataBase(userData);
+
+        //             Snackbar.Add("Успешно", Severity.Success);
+        //             navigation.NavigateTo("/admin");
+
+        //         }
+        //         else
+        //         {
+        //             Snackbar.Add("Пользователь с такими данными уже существует.", Severity.Error);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Snackbar.Add("Не все необходимые поля заполнены.", Severity.Error);
+        //     }
+        // }
+    }
+}
+
+<style>
+
+</style>

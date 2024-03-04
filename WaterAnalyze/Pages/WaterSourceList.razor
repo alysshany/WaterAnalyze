@@ -1,0 +1,63 @@
+﻿@using Data
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject NavigationManager Navigation;
+@page "/sourceList"
+
+
+<MudCard Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+
+        <MudPaper>
+            <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
+                      Items="@Elements"
+                      GroupBy="@_groupDefinition"
+                      GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+                      GroupFooterClass="mb-4"
+                      Dense="true"
+                      @ref="_tableRef">
+                <HeaderContent>
+                    <MudTh>Название</MudTh>
+                    <MudTh>Тип</MudTh>
+                    <MudTh>Частота отбора</MudTh>
+                </HeaderContent>
+                <GroupHeaderTemplate>
+                        <MudTh colspan="3">@($"{WaterAnalyzeContext.Directions.Where(x => x.Id == (int)context.Key).First().Title}") </MudTh>
+                </GroupHeaderTemplate>
+                <RowTemplate >
+                        <MudTd DataLabel="Название" @onclick="() => ToDirectionInfo(context.Id)">@context.Title</MudTd>
+                        <MudTd DataLabel="Тип" @onclick="() => ToDirectionInfo(context.Id)">@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == context.SourceTypeId).First().Title</MudTd>
+                        <MudTd DataLabel="Частота отбора" @onclick="() => ToDirectionInfo(context.Id)"> @WaterAnalyzeContext.SamplingFrequencies.Where(x => x.Id == context.SamplingFrequencyId).First().Value</MudTd>
+                </RowTemplate>
+            @*     <GroupFooterTemplate>
+                    <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="5">Total Mass: @context.Items.Sum((e) => e.Molar)</MudTh>
+                </GroupFooterTemplate> *@
+            </MudTable>
+        </MudPaper>
+
+
+
+</MudCard>
+
+@code {
+    private MudTable<Source> _tableRef;
+
+    private  TableGroupDefinition<Source> _groupDefinition = new()
+        {
+            GroupName = "Group",
+            Indentation = false,
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.DirectionId
+        };
+
+    private IEnumerable<Source> Elements = new List<Source>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = WaterAnalyzeContext.Sources.ToList();
+    }
+
+    public void ToDirectionInfo(int id)
+    {
+        Navigation.NavigateTo($"/sourceInfo/{id}");
+    }
+}

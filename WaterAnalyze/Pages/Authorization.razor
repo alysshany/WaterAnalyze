@@ -1,0 +1,99 @@
+﻿@page "/autho"
+@using Data
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject CurrentUser CurrentUser
+
+<PageTitle>Авторизация</PageTitle>
+
+<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+    <MudCard Style="flex: 50%;">
+        <MudImage Src='/img/Mesh-73.png' Style="width: 99%; object-fit: fill"></MudImage>
+    </MudCard>
+    <div Style="flex: 50%; ">
+        <MudTextField T="string" Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
+        <MudTextField T="string" InputType=InputType.Password Label="Пароль" Variant="Variant.Outlined" @bind-Value="password"></MudTextField>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" OnClick="ToAutho">Войти</MudButton>
+    </div>
+</MudCard>
+
+@code {
+    string login;
+    string password;
+
+    public void ToAutho()
+    {
+        if (login != null && password != null)
+        {
+            var account = WaterAnalyzeContext.Accounts.Where(x => x.Login == login).First();
+            if (account.Password == password)
+            {
+                var user = WaterAnalyzeContext.Users.Where(x => x.Id == account.UserId).First();
+                CurrentUser.CurrentUserData = user;
+                Snackbar.Add("Успешно", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Неверный пароль", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Пожалуйста, введите все необходимые данные", Severity.Warning);
+        }
+    }
+
+}
+
+<style>
+
+    /* #map {
+        width: 900px;
+        height: 600px;
+        padding: 0;
+        margin-top: 2%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    } */
+    /*.loader{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%,-50%);
+     -moz-transform: translate(-50%,-50%);
+      -ms-transform: translate(-50%,-50%);
+       -o-transform: translate(-50%,-50%);
+          transform: translate(-50%,-50%);
+}
+
+.loader h1{
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+  font-size: 10em;
+  color: rgba(255,255,255,.1);
+  background-image: url(https://image.ibb.co/ciSeac/image.png);
+  background-repeat: repeat-x;
+  -webkit-background-clip: text;
+  animation: animate 15s linear infinite;
+
+}
+keyframes animate{
+  0%{
+    background-position: left 0px top 80px;
+  }
+  40%{
+    background-position: left 800px top -50px;
+  }
+  80%{
+    background-position: left 1800px top -50px;
+  }
+  100%{
+    background-position: left 2400px top 80px;
+  }*/
+
+
+</style>

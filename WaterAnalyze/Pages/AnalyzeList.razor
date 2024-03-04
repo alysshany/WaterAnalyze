@@ -1,0 +1,74 @@
+﻿@using Data
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject NavigationManager Navigation;
+@page "/analyzeList"
+
+
+<MudCard Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%;">
+
+    <MudPaper>
+        <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
+                    Items="@Elements"
+                    GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+                    GroupFooterClass="mb-4"
+                    Dense="true"
+                    Filter="new Func<Analyze,bool>(FilterFunc1)"
+                    @ref="_tableRef">
+            <ToolBarContent>
+                @* <MudText Typo="Typo.h6">Periodic Elements</MudText> *@
+                
+                <MudTextField @bind-Value="searchString1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudSpacer />
+                <MudButton Href="/analyzeInfo" Style="margin-left: auto;margin-right: auto;">Добавить анализ</MudButton>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Дата отбора пробы</MudTh>
+                <MudTh>Дата проведения анализа</MudTh>
+                <MudTh>Лаборант</MudTh>
+            </HeaderContent>
+            <RowTemplate >
+                <MudTd DataLabel="Название" >@context.Date.Value.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Тип">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Частота отбора"> @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name</MudTd>
+            </RowTemplate>
+        @*     <GroupFooterTemplate>
+                <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="5">Total Mass: @context.Items.Sum((e) => e.Molar)</MudTh>
+            </GroupFooterTemplate> *@
+        </MudTable>
+    </MudPaper>
+
+
+
+</MudCard>
+ 
+@code {
+    private MudTable<Analyze> _tableRef;
+    private string searchString1 = "";
+
+    private IEnumerable<Analyze> Elements = new List<Analyze>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = WaterAnalyzeContext.Analyzes.ToList();
+    }
+
+    public void ToDirectionInfo(int id)
+    {
+        Navigation.NavigateTo($"/sourceInfo/{id}");
+    }
+
+    private bool FilterFunc1(Analyze element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Analyze element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (WaterAnalyzeContext.Users.Where(x => x.Id == element.UserId).First().Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (WaterAnalyzeContext.Users.Where(x => x.Id == element.UserId).First().Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        // if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
+        //     return true;
+        return false;
+    }
+}

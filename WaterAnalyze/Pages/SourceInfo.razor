@@ -1,0 +1,116 @@
+﻿@page "/sourceInfo/{sourceId}"
+@using Data
+@using Microsoft.JSInterop
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Главная</PageTitle>
+
+<MudGrid Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+	<MudItem xs="6" >
+		<MudPaper >
+			<div id="map"></div>
+		</MudPaper>
+	</MudItem>
+	<MudItem xs="6" >
+		<MudPaper >
+			<MudTextField Label="Название" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@source.Title" Disabled=true></MudTextField>
+			<MudTextField Label="Время, чтобы добраться" Variant="Variant.Text" T="TimeSpan?" Margin="Margin.Dense" @bind-Value="@source.TravelTime" Disabled=true></MudTextField>
+			<MudTextField Label="Направление" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title" Disabled=true></MudTextField>
+			<MudTextField Label="Тип" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title" Disabled=true></MudTextField>
+		</MudPaper>
+	</MudItem>
+	<MudItem xs="12">
+		<div>
+			<MudButton Href="/analyzeInfo" Style="margin-bottom: 2%;">Добавить анализ</MudButton>
+			@if (Elements.Count != 0)
+			{
+				<MudTable Items="@Elements.Take(1)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+					<HeaderContent>
+						<MudTh>Дата отбора</MudTh>
+						<MudTh>Дата проведения</MudTh>
+						<MudTh>PH</MudTh>
+						<MudTh>Общая жесткость</MudTh>
+						<MudTh>Cl (мг/л)</MudTh> 
+						<MudTh>HCO3 (мг/л)</MudTh>
+						<MudTh>SO4 (мг/л)</MudTh>
+						<MudTh>Ca (мг/л)</MudTh>
+						<MudTh>Mg (мг/л)</MudTh>
+						<MudTh>Fe(общий) (мг/л)</MudTh>
+						<MudTh>Нефть (мг/л)</MudTh>
+						<MudTh>Общие минералы (мг/л)</MudTh>
+					</HeaderContent>
+					<RowTemplate>
+						<MudTd DataLabel="Дата отбора">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
+						<MudTd DataLabel="Дата проведения">@context.Date.Value.ToShortDateString()</MudTd>
+						<MudTd DataLabel="PH">@context.AcidityIndex</MudTd>
+						<MudTd DataLabel="Общая жесткость">@context.Hardness</MudTd>
+						<MudTd DataLabel="Cl">@context.Сhlorine</MudTd>
+						<MudTd DataLabel="HCO3">@context.Bicarbonate</MudTd>
+						<MudTd DataLabel="SO4">@context.Sulfate</MudTd>
+						<MudTd DataLabel="Ca">@context.Calcium</MudTd>
+						<MudTd DataLabel="Mg">@context.Magnesium</MudTd>
+						<MudTd DataLabel="Fe">@context.Iron</MudTd>
+						<MudTd DataLabel="Нефть">@context.Oil</MudTd>
+						<MudTd DataLabel="Общие минералы">@context.CommonMinerals</MudTd>
+					</RowTemplate>
+				</MudTable>
+			}
+		</div>
+	</MudItem>
+</MudGrid>
+
+@* <MudGrid Style="width: 60%; height: 30%;display: block;margin-left: auto;margin-right: auto; margin-top: 2%;">
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    
+</MudGrid> *@
+
+
+@code {
+	[Parameter]
+	public string? sourceId { get; set; }
+
+	Source source;
+
+	private bool _hidePosition;
+	private bool _loading;
+	private List<Analyze> Elements = new List<Analyze>();
+
+	protected override void OnInitialized()
+	{
+		source = WaterAnalyzeContext.Sources.Where(x => x.Id == Convert.ToInt32(sourceId)).First();
+		Elements = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == Convert.ToInt32(sourceId)).ToList();
+		Elements.Reverse();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await JSRuntime.InvokeVoidAsync("start", source.CoordinatesX, source.CoordinatesY);
+		}
+	}
+
+
+}
+
+<style>
+	#map {
+		width: 500px;
+		height: 300px;
+		padding: 0;
+		margin-top: 2%;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+</style>

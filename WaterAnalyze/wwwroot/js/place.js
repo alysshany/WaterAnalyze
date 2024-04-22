@@ -5,6 +5,11 @@ function start(x, y) {
     ymaps.ready(map(x,y));
 }
 
+function deleteMap() {
+    // Дождёмся загрузки API и готовности DOM.
+    myMap.destroy();
+}
+
 function map(x, y) {
     myMap = new ymaps.Map('map', {
         // При инициализации карты обязательно нужно указать

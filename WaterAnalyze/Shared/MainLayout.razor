@@ -9,22 +9,25 @@
 <MudLayout>
     <MudAppBar >
         <MudContainer>
-            <MudButton Href="/">ClearWater</MudButton>
+            <MudButton  OnClick="ToLogOut">ClearWater</MudButton>
         </MudContainer>
-        <MudContainer>
-            <MudButton Href="/sourceList">Направления</MudButton>
-            <MudButton Href="/monitoring">Мониторинг</MudButton>
-            <MudButton OnClick="ToAccount">Аккаунт</MudButton>
+        <MudContainer Style="display: flex; justify-content: right;">
             @if (CurrentUser.CurrentUserData != null)
             {
+                <MudButton  Href="/sourceList">Направления</MudButton>                            
+                <MudButton  Href="/monitoring">Мониторинг</MudButton>
                 if (CurrentUser.CurrentUserData.RoleId == 1)
                 {
-                    <MudButton Href="/analyzeList">Сотрудники</MudButton>
+                    <MudButton Href="/workerList">Сотрудники</MudButton>
                 }
                 else if (CurrentUser.CurrentUserData.RoleId == 2)
                 {
                     <MudButton Href="/analyzeList">Анализы</MudButton>
                 }
+            }
+            else
+            {
+                <MudButton  OnClick="ToAccount">Аккаунт</MudButton>
             }
         </MudContainer>
     </MudAppBar>
@@ -38,8 +41,8 @@
         {
             Palette = new PaletteLight
             {
-                //Primary = "#3F51B5",
-                //Secondary = "#4CAF50",
+                Primary = "#4f97c2",
+                // Secondary = "#7C7C7C",
                 AppbarBackground = "#FFFFFF",
                 AppbarText = "#000000",
                 //TableHover = "#C7E8CA",
@@ -61,6 +64,12 @@
         {
             Navigation.NavigateTo($"/autho");
         }
+    }
+
+    public void ToLogOut()
+    {
+        CurrentUser.CurrentUserData = null;
+        Navigation.NavigateTo($"/");
     }
 
 }

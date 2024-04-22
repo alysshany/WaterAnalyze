@@ -3,15 +3,16 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 @inject WaterAnalyzeContext WaterAnalyzeContext
 @inject CurrentUser CurrentUser
 
 <PageTitle>Авторизация</PageTitle>
 
-<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
-    <MudCard Style="flex: 50%;">
-        <MudImage Src='/img/Mesh-73.png' Style="width: 99%; object-fit: fill"></MudImage>
-    </MudCard>
+<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; overflow: hidden">
+    <div Style="flex: 50%;">
+        <MudImage Src='/img/paperOne.jpg' Style="width: 99%; object-fit: fill"></MudImage>
+    </div>
     <div Style="flex: 50%; ">
         <MudTextField T="string" Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
         <MudTextField T="string" InputType=InputType.Password Label="Пароль" Variant="Variant.Outlined" @bind-Value="password"></MudTextField>
@@ -33,6 +34,7 @@
                 var user = WaterAnalyzeContext.Users.Where(x => x.Id == account.UserId).First();
                 CurrentUser.CurrentUserData = user;
                 Snackbar.Add("Успешно", Severity.Success);
+                Navigation.NavigateTo($"/");
             }
             else
             {

@@ -13,9 +13,9 @@ public partial class Analyze
 
     public double? Hardness { get; set; }
 
-    public double? Сhlorine { get; set; }
+    public double? Сhloride { get; set; }
 
-    public double? Bicarbonate { get; set; }
+    public double? Gidrocorbonat { get; set; }
 
     public double? Sulfate { get; set; }
 
@@ -23,11 +23,7 @@ public partial class Analyze
 
     public double? Magnesium { get; set; }
 
-    public double? Iron { get; set; }
-
     public double? Oil { get; set; }
-
-    public double? CommonMinerals { get; set; }
 
     public DateTime? DateOfSelection { get; set; }
 

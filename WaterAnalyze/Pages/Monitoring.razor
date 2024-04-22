@@ -6,16 +6,16 @@
 
 <PageTitle>Главная</PageTitle>
 
-<MudPaper Style="display: block; width: 30%; margin-left: auto; margin-top: 2%; margin-right: auto; ">
+<div Style="display: block; width: 30%; margin-left: auto; margin-top: 2%; margin-right: auto; ">
     <MudSpacer />
-    <MudSelect T="string" Label="Отклонения" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-        <MudSelectItem T="string" Value="@("Хлор")" />
-        <MudSelectItem T="string" Value="@("Магний")" />
+    <MudSelect ValueChanged="TypeChange" T="string" Label="Отклонения в концентрации" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+        <MudSelectItem T="string" Value="@("Хлорид ионов")" />
+        <MudSelectItem T="string" Value="@("Ионов магний")" />
         <MudSelectItem T="string" Value="@("xd")" />
     </MudSelect>
-</MudPaper>
-<div Style="display: flex; width: 70%; height: 18%;margin-left: auto; margin-top: 2%; margin-right: auto; ">
-    <MudCard Style="flex: 70%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+</div>
+<div Style="display: flex; width: 80%; height: 18%;margin-left: auto; margin-top: 2%; margin-right: auto; ">
+    <MudCard Style="flex: 80%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
         <div id="map"></div>
     </MudCard>
 @*     <div Style="flex: 20%; ">
@@ -42,8 +42,155 @@
 
             foreach (var source in sourceList)
             {
-                await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY);
+                List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                
+                var hardness = $"";
+                var sulfat = $"";
+                var chloride = $"";
+                var calcium = $"";
+                var gidrocarbonat = $"";
+                var oil = $"";
+                var magnesium = $"";
+                var acidityIndex = $"";
+                
+                if (analyzeList.Count > 1)
+                {
+                    analyzeList.Reverse();
+                    var lastAnalyze = analyzeList[0];
+                    var preLastAnalyze = analyzeList[1];
+                    //Жесткость
+                    if (lastAnalyze.Hardness > preLastAnalyze.Hardness)
+                    {
+                        hardness = $"Жесткость: {lastAnalyze.Hardness} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        hardness = $"Жесткость: {lastAnalyze.Hardness} ↓";
+                    }
+                    else
+                    {
+                        hardness = $"Жесткость: {lastAnalyze.Hardness}";
+                    }
+                    //Сульфаты
+                    if (lastAnalyze.Sulfate > preLastAnalyze.Sulfate)
+                    {
+                        sulfat = $"Сульфаты: {lastAnalyze.Sulfate} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        sulfat = $"Сульфаты: {lastAnalyze.Sulfate} ↓";
+                    }
+                    else
+                    {
+                        sulfat = $"Сульфаты: {lastAnalyze.Sulfate}";
+                    }
+                    //Хлорид
+                    if (lastAnalyze.Сhloride > preLastAnalyze.Сhloride)
+                    {
+                        chloride = $"Хлориды: {lastAnalyze.Сhloride} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        chloride = $"Хлориды: {lastAnalyze.Сhloride} ↓";
+                    }
+                    else
+                    {
+                        chloride = $"Хлориды: {lastAnalyze.Сhloride}";
+                    }
+                    //Кальций
+                    if (lastAnalyze.Calcium > preLastAnalyze.Calcium)
+                    {
+                        calcium = $"Кальций: {lastAnalyze.Calcium} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        calcium = $"Кальций: {lastAnalyze.Calcium} ↓";
+                    }
+                    else
+                    {
+                        calcium = $"Кальций: {lastAnalyze.Calcium}";
+                    }
+                    //Гидрокарбонат
+                    if (lastAnalyze.Gidrocorbonat > preLastAnalyze.Gidrocorbonat)
+                    {
+                        gidrocarbonat = $"Гидрокарбонат: {lastAnalyze.Gidrocorbonat} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        gidrocarbonat = $"Гидрокарбонат: {lastAnalyze.Gidrocorbonat} ↓";
+                    }
+                    else
+                    {
+                        gidrocarbonat = $"Гидрокарбонат: {lastAnalyze.Gidrocorbonat}";
+                    }
+                    //Нефтепродукты
+                    if (lastAnalyze.Gidrocorbonat > preLastAnalyze.Gidrocorbonat)
+                    {
+                        oil = $"Нетфепродукты: {lastAnalyze.Oil} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        oil = $"Нетфепродукты: {lastAnalyze.Oil} ↓";
+                    }
+                    else
+                    {
+                        oil = $"Нетфепродукты: {lastAnalyze.Oil}";
+                    }
+                    //Магний
+                    if (lastAnalyze.Magnesium > preLastAnalyze.Magnesium)
+                    {
+                        magnesium = $"Магний: {lastAnalyze.Magnesium} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        magnesium = $"Магний: {lastAnalyze.Magnesium} ↓";
+                    }
+                    else
+                    {
+                        magnesium = $"Магний: {lastAnalyze.Magnesium}";
+                    }
+                    //PH
+                    if (lastAnalyze.AcidityIndex > preLastAnalyze.AcidityIndex)
+                    {
+                        acidityIndex = $"PH: {lastAnalyze.AcidityIndex} ↑";
+                    }
+                    else if (lastAnalyze.Hardness < preLastAnalyze.Hardness)
+                    {
+                        acidityIndex = $"PH: {lastAnalyze.AcidityIndex} ↓";
+                    }
+                    else
+                    {
+                        acidityIndex = $"PH: {lastAnalyze.AcidityIndex}";
+                    }
+
+                }
+                else if (analyzeList.Count == 1)
+                {
+                    Analyze lastAnalyze = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).First();
+
+                    hardness = $"Жесткость: {lastAnalyze.Hardness}";
+                    sulfat = $"Сульфаты: {lastAnalyze.Sulfate}";
+                    chloride = $"Хлориды: {lastAnalyze.Сhloride}";
+                    calcium = $"Кальций: {lastAnalyze.Calcium}";
+                    gidrocarbonat = $"Гидрокарбонат: {lastAnalyze.Gidrocorbonat}";
+                    oil = $"Нетфепродукты: {lastAnalyze.Oil}";
+                    magnesium = $"Магний: {lastAnalyze.Magnesium}";
+                    acidityIndex = $"PH: {lastAnalyze.AcidityIndex}";
+                }
+                await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY, source.Title);
             }
+        }
+    }
+
+    public void TypeChange(string selected)
+    {
+        switch (selected)
+        {
+            case "Хлорид ионов":
+                break;
+            case "Ионов магний":
+                break;
+
         }
     }
 
@@ -51,7 +198,7 @@
 
 <style>
     #map {
-        width: 1100px;
+        width: 1300px;
         height: 500px;
         padding: 0;
         display: block;

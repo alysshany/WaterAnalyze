@@ -4,8 +4,8 @@
 @page "/sourceList"
 
 
-<MudCard Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
-
+<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+    <div Style="flex: 50%;">
         <MudPaper>
             <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
                       Items="@Elements"
@@ -32,9 +32,11 @@
                 </GroupFooterTemplate> *@
             </MudTable>
         </MudPaper>
+    </div>
 
-
-
+    <div Style="flex: 50%;">
+        <MudImage Src='/img/paperOne.jpg' Style="width: 100%; object-fit: fill"></MudImage>
+    </div>
 </MudCard>
 
 @code {

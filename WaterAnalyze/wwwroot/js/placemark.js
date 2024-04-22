@@ -23,12 +23,12 @@ function init() {
 
 }
 
-function startAddingObjects(x, y) {
+function startAddingObjects(x, y, title) {
     // Дождёмся загрузки API и готовности DOM.
-    ymaps.ready(mapBuild(x, y));
+    ymaps.ready(mapBuild(x, y, title));
 }
 
-function mapBuild(x, y) {
+function mapBuild(x, y, title) {
 
     myGeoObject = new ymaps.GeoObject({
         // Описание геометрии.
@@ -42,9 +42,18 @@ function mapBuild(x, y) {
             //iconContent: '',
             //hintContent: 'Ну давай уже тащи'
         }
-    });
+    })
+    
 
     myMap.geoObjects
         .add(myGeoObject)
+        .add(new ymaps.Placemark([x, y], {
+            balloonContentHeader: title,
+            balloonContentBody: "Содержимое <em>балуна</em> метки",
+            balloonContentFooter: "Подвал",
+        }, {
+            preset: 'islands#icon',
+            iconColor: '#0095b6'
+        }))
 }
 

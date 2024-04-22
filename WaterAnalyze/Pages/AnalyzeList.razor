@@ -1,12 +1,14 @@
 ﻿@using Data
 @inject WaterAnalyzeContext WaterAnalyzeContext
-@inject NavigationManager Navigation;
+@inject NavigationManager Navigation
 @page "/analyzeList"
 
 
-<MudCard Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%;">
-
-    <MudPaper>
+<MudCard Style="display: flex; width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; ">
+    <div Style="flex: 50%;">
+        <MudImage Src='/img/paperOne.jpg' Style="width: 99%; object-fit: fill"></MudImage>
+    </div>
+    <div Style="flex: 50%;">
         <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
                     Items="@Elements"
                     GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
@@ -19,26 +21,25 @@
                 
                 <MudTextField @bind-Value="searchString1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudSpacer />
-                <MudButton Href="/analyzeInfo" Style="margin-left: auto;margin-right: auto;">Добавить анализ</MudButton>
+                <MudButton Href="/analyzeInfo" Color="Color.Primary" Style="margin-left: auto;margin-right: auto;">Добавить анализ</MudButton>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Дата отбора пробы</MudTh>
                 <MudTh>Дата проведения анализа</MudTh>
+                <MudTh>Направление</MudTh>
+                <MudTh>Источник</MudTh>
                 <MudTh>Лаборант</MudTh>
             </HeaderContent>
             <RowTemplate >
-                <MudTd DataLabel="Название" >@context.Date.Value.ToShortDateString()</MudTd>
-                <MudTd DataLabel="Тип">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
+                <MudTd @onclick="() => NavigationToEditingAnalyze(context.Id.ToString())" DataLabel="Дата проведения анализа">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Направление">@WaterAnalyzeContext.Directions.Where(x => x.Id == WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().DirectionId).First().Title</MudTd>
+                <MudTd DataLabel="Источник">@WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().Title</MudTd>
                 <MudTd DataLabel="Частота отбора"> @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name</MudTd>
             </RowTemplate>
         @*     <GroupFooterTemplate>
                 <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="5">Total Mass: @context.Items.Sum((e) => e.Molar)</MudTh>
             </GroupFooterTemplate> *@
         </MudTable>
-    </MudPaper>
-
-
-
+    </div>
 </MudCard>
  
 @code {
@@ -70,5 +71,10 @@
         // if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
         //     return true;
         return false;
+    }
+
+    public void NavigationToEditingAnalyze(string analyze)
+    {
+        Navigation.NavigateTo($"/analyzeInfo/{analyze}");
     }
 }

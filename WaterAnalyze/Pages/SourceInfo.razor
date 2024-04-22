@@ -2,11 +2,12 @@
 @using Data
 @using Microsoft.JSInterop
 @inject WaterAnalyzeContext WaterAnalyzeContext
+@inject CurrentUser CurrentUser
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Главная</PageTitle>
 
-<MudGrid Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 2%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+<MudGrid Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
 	<MudItem xs="6" >
 		<MudPaper >
 			<div id="map"></div>
@@ -22,7 +23,14 @@
 	</MudItem>
 	<MudItem xs="12">
 		<div>
-			<MudButton Href="/analyzeInfo" Style="margin-bottom: 2%;">Добавить анализ</MudButton>
+			@if (CurrentUser.CurrentUserData != null)
+			{
+				if (CurrentUser.CurrentUserData.RoleId == 2)
+				{
+					<MudButton Color="Color.Primary" Href="/analyzeInfo" Style="margin-bottom: 2%;">Добавить анализ</MudButton>
+				}
+			}
+			
 			@if (Elements.Count != 0)
 			{
 				<MudTable Items="@Elements.Take(1)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
@@ -36,23 +44,19 @@
 						<MudTh>SO4 (мг/л)</MudTh>
 						<MudTh>Ca (мг/л)</MudTh>
 						<MudTh>Mg (мг/л)</MudTh>
-						<MudTh>Fe(общий) (мг/л)</MudTh>
 						<MudTh>Нефть (мг/л)</MudTh>
-						<MudTh>Общие минералы (мг/л)</MudTh>
 					</HeaderContent>
 					<RowTemplate>
 						<MudTd DataLabel="Дата отбора">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
 						<MudTd DataLabel="Дата проведения">@context.Date.Value.ToShortDateString()</MudTd>
 						<MudTd DataLabel="PH">@context.AcidityIndex</MudTd>
 						<MudTd DataLabel="Общая жесткость">@context.Hardness</MudTd>
-						<MudTd DataLabel="Cl">@context.Сhlorine</MudTd>
-						<MudTd DataLabel="HCO3">@context.Bicarbonate</MudTd>
+						<MudTd DataLabel="Cl">@context.Сhloride</MudTd>
+						<MudTd DataLabel="HCO3">@context.Gidrocorbonat</MudTd>
 						<MudTd DataLabel="SO4">@context.Sulfate</MudTd>
 						<MudTd DataLabel="Ca">@context.Calcium</MudTd>
 						<MudTd DataLabel="Mg">@context.Magnesium</MudTd>
-						<MudTd DataLabel="Fe">@context.Iron</MudTd>
 						<MudTd DataLabel="Нефть">@context.Oil</MudTd>
-						<MudTd DataLabel="Общие минералы">@context.CommonMinerals</MudTd>
 					</RowTemplate>
 				</MudTable>
 			}

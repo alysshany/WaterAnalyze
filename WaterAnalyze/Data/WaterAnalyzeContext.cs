@@ -21,6 +21,8 @@ public partial class WaterAnalyzeContext : DbContext
 
     public virtual DbSet<Direction> Directions { get; set; }
 
+    public virtual DbSet<Equipment> Equipment { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Sample> Samples { get; set; }
@@ -30,6 +32,8 @@ public partial class WaterAnalyzeContext : DbContext
     public virtual DbSet<Source> Sources { get; set; }
 
     public virtual DbSet<SourceType> SourceTypes { get; set; }
+
+    public virtual DbSet<Task> Tasks { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -82,6 +86,22 @@ public partial class WaterAnalyzeContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Equipment>(entity =>
+        {
+            entity.Property(e => e.DateBegin).HasColumnType("date");
+            entity.Property(e => e.DateEnd).HasColumnType("date");
+            entity.Property(e => e.DocumentNumber)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Equipment)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Equipment_User");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -145,6 +165,19 @@ public partial class WaterAnalyzeContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Task>(entity =>
+        {
+            entity.ToTable("Task");
+
+            entity.Property(e => e.Info)
+                .HasMaxLength(300)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Task_User");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -1,7 +1,7 @@
 ﻿@using Data
 @inject WaterAnalyzeContext WaterAnalyzeContext
 @inject NavigationManager Navigation;
-@page "/workerList"
+@page "/equipmentList"
 
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; ">
@@ -14,14 +14,13 @@
                     GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
                     GroupFooterClass="mb-4"
                     Dense="true"
-                    Filter="new Func<User,bool>(FilterFunc1)"
+                  Filter="new Func<Equipment,bool>(FilterFunc1)"
                     @ref="_tableRef">
             <ToolBarContent>
                 @* <MudText Typo="Typo.h6">Periodic Elements</MudText> *@
                 
                 <MudTextField @bind-Value="searchString1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudSpacer />
-                <MudButton Href="/workerInfo" Variant="Variant.Filled" Style="margin-left: auto;margin-right: auto;">Добавить сотрудника</MudButton>
             </ToolBarContent>
            @* <HeaderContent>
                 <MudTh>Фамилия</MudTh>
@@ -31,8 +30,8 @@
                 <MudTd>
                     <MudCard @onclick="() => NavigationToEditingWorker(context.Id.ToString())">
                         <MudCardContent>
-                            <MudText>@context.Surname @context.Name @context.Patronymic</MudText>
-                            <MudText Typo="Typo.body2">@WaterAnalyzeContext.Roles.Where(x => x.Id == context.RoleId).First().Title</MudText>
+                            <MudText>@context.Title </MudText>
+                            <MudText Typo="Typo.body2"></MudText>
                         </MudCardContent>
                     </MudCard>
                 </MudTd>
@@ -51,28 +50,28 @@
 </MudCard>
  
 @code {
-    private MudTable<User> _tableRef;
+    private MudTable<Equipment> _tableRef;
     private string searchString1 = "";
 
-    private IEnumerable<User> Elements = new List<User>();
+    private IEnumerable<Equipment> Elements = new List<Equipment>();
 
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        Elements = WaterAnalyzeContext.Users.ToList();
+        Elements = WaterAnalyzeContext.Equipment.ToList();
     }
 
-    private bool FilterFunc1(User element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(Equipment element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(User element, string searchString)
+    private bool FilterFunc(Equipment element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (WaterAnalyzeContext.Users.Where(x => x.Id == element.Id).First().Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (WaterAnalyzeContext.Users.Where(x => x.Id == element.Id).First().Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (WaterAnalyzeContext.Users.Where(x => x.Id == element.Id).First().Patronymic.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
+        // if (WaterAnalyzeContext.Equipment.Where(x => x.Id == element.Id).First().Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
+        // if (WaterAnalyzeContext.Users.Where(x => x.Id == element.Id).First().Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
+        // if (WaterAnalyzeContext.Users.Where(x => x.Id == element.Id).First().Patronymic.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
         // if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
         //     return true;
         return false;

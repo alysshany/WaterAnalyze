@@ -23,12 +23,45 @@ function init() {
 
 }
 
-function startAddingObjects(x, y, title) {
+function startAddingObjects(x, y, title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex) {
     // Дождёмся загрузки API и готовности DOM.
-    ymaps.ready(mapBuild(x, y, title));
+    ymaps.ready(mapBuild(x, y, title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex));
 }
 
-function mapBuild(x, y, title) {
+function startAddingBaloon(x, y) {
+    // Дождёмся загрузки API и готовности DOM.
+    ymaps.ready(baloonBuild(x, y));
+}
+
+function baloonBuild(x, y) {
+
+    var myCircle = new ymaps.Circle([
+        // Координаты центра круга.
+        [x, y],
+        // Радиус круга в метрах.
+        10
+    ], {
+    }, {
+        // Задаем опции круга.
+        // Включаем возможность перетаскивания круга.
+        draggable: false,
+        // Цвет заливки.
+        // Последний байт (77) определяет прозрачность.
+        // Прозрачность заливки также можно задать используя опцию "fillOpacity".
+        fillColor: "#DB709377",
+        // Цвет обводки.
+        strokeColor: "#990066",
+        // Прозрачность обводки.
+        strokeOpacity: 0.8,
+        // Ширина обводки в пикселях.
+        strokeWidth: 5
+    });
+
+    // Добавляем круг на карту.
+    myMap.geoObjects.add(myCircle);
+}
+
+function mapBuild(x, y, title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex) {
 
     myGeoObject = new ymaps.GeoObject({
         // Описание геометрии.
@@ -49,8 +82,24 @@ function mapBuild(x, y, title) {
         .add(myGeoObject)
         .add(new ymaps.Placemark([x, y], {
             balloonContentHeader: title,
-            balloonContentBody: "Содержимое <em>балуна</em> метки",
-            balloonContentFooter: "Подвал",
+            balloonContentBody: [
+                hardness,
+                '<br/>',
+                sulfat,
+                '<br/>',
+                chloride,
+                '<br/>',
+                calcium,
+                '<br/>',
+                gidrocarbonat,
+                '<br/>',
+                oil,
+                '<br/>',
+                magnesium,
+                '<br/>',
+                acidityIndex,
+                '<br/>',
+                chloride].join(''),
         }, {
             preset: 'islands#icon',
             iconColor: '#0095b6'

@@ -4,7 +4,7 @@
 @page "/sourceList"
 
 
-<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+<MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
     <div Style="flex: 50%;">
         <MudPaper>
             <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
@@ -33,10 +33,14 @@
             </MudTable>
         </MudPaper>
     </div>
-
+@* 
     <div Style="flex: 50%;">
         <MudImage Src='/img/paperOne.jpg' Style="width: 100%; object-fit: fill"></MudImage>
-    </div>
+    </div> *@
+
+    <MudCard Elevation="0" Style="flex: 50%; border-radius: 10px; padding: 10px">
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+    </MudCard>
 </MudCard>
 
 @code {
@@ -53,7 +57,7 @@
 
     private IEnumerable<Source> Elements = new List<Source>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
         Elements = WaterAnalyzeContext.Sources.ToList();
     }
@@ -63,3 +67,9 @@
         Navigation.NavigateTo($"/sourceInfo/{id}");
     }
 }
+
+<style>
+    body {
+        background-color: #fafafa;
+    }
+</style>

@@ -1,30 +1,174 @@
 ﻿@page "/"
+@using Data
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject CurrentUser CurrentUser
+@inject WaterAnalyzeContext WaterAnalyzeContext
 
 <PageTitle>Главная</PageTitle>
 
-<div style="display:flex; width: 80%; display: flex;margin-left: auto;margin-right: auto; margin-top: 2%; align-self: center; align-items: center; justify-content: center;   ">
-    <div style="flex: 50%; overflow: ">
-        <MudCard Style="background-color: #4f97c2;  width:450px; height: 260px; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; margin-bottom: 6%; margin-left: 5%"></MudCard>
-        <MudCard Style="background-color: #A7A7A7; width:450px; height: 260px; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; margin-bottom: 8%; margin-left: 5%"></MudCard>
-    </div>
-    <MudCard style="flex: 50%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
-        <div id="map"></div>
+<MudCard Elevation="5" style="display:flex; width: 90%; margin-left: auto;  margin-right: auto; margin-top: 1%; border-radius: 15px; align-self: center; align-items: center; justify-content: center;   ">
+    <MudCard Elevation="0" Style="flex: 50%; display: inline-block;" >
+        <MudCard Elevation="0" Class="d-flex mx-auto">
+            <MudCard Elevation="5" Style="background-color: #4f97c2; border-radius: 10px; width:50%; height: 250px; margin-bottom: 5%; margin-left: 5%">
+                @if (CurrentUser.CurrentUserData != null && CurrentUser.CurrentUserData.RoleId == 1002)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px" OnClick="() => visible = true">Добавить задание</MudButton>
+                }
+                @if (CurrentUser.CurrentUserData != null && CurrentUser.CurrentUserData.RoleId == 2)
+                {
+                    <MudTable Elevation="5" Items="@Tasks" @bind-SelectedItem="selectedItem1" Height="auto" Style="overflow: scroll;">
+                        <HeaderContent>
+                            <MudTh>Описание</MudTh>
+                            <MudTh>Выполнение</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Описание">@context.Info</MudTd>
+                            <MudTd DataLabel="Выполнение"><MudCheckBox @bind-Checked="@context.IsDone" Class="d-flex mx-auto" Color="Color.Info" @onclick="() => RadioButtonChanged(context)"></MudCheckBox></MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudCard>
+            <MudCard Elevation="0" Style="width:50%;">
+                <MudText Style="margin-left: 5%">Водоёмы</MudText>
+                <MudCard Elevation="5" Style="display: flex; justify-content: center; align-items: center; background-color: #e5e5e5; border-radius: 10px; height: 80px; margin-bottom: 5%; margin-left: 5%; margin-top: 2%">
+                    <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.WaterDrop"></MudIcon>
+                    <MudText>@countOfSources</MudText>
+                </MudCard>
+                <MudText Style="margin-left: 5%">Анализы</MudText>
+                <MudCard Elevation="5" Style="display: flex; justify-content: center; align-items: center; background-color: #e5e5e5; border-radius: 10px; height: 80px; margin-bottom: 5%; margin-left: 5%; margin-top: 2%">
+                    <MudIcon  Size="Size.Large" Icon="@Icons.Material.Filled.FilterList"></MudIcon>
+                    <MudText>@countOfAnalyzes</MudText>
+                </MudCard>
+            </MudCard>
+        </MudCard>
+        <MudCard Elevation="0">
+            <MudCard Elevation="5" Style="background-color: #e5e5e5; border-radius: 10px; width:95%; height: 260px; margin-bottom: 5%; margin-left: 5%">
+                <MudImage Src='/img/colb.jpg' Style=" object-fit: cover; overflow:hidden; height: 260px; width: 100%; border-radius: 10px;"></MudImage>
+            </MudCard>
+        </MudCard>
     </MudCard>
-</div>
+
+    <div style="flex: 50%;  ">
+        <div id="map"></div>
+    </div>
+</MudCard>
+
+<MudDialog Class="content" @bind-IsVisible="visible" Options="closeButton">
+    <TitleContent>
+        <MudText Style="font-size: 18px">
+                Добавление задания:
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="box-content-row">
+            <div class="box-horizontal">
+                <p>Задание:<span class="required"> *</span></p>
+            </div>
+            <MudTextField T="String" @bind-Value="@taskInfo" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px" />
+        </div>
+        <div class="box-content-row">
+            <div class="box-horizontal">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" />
+                <p>Лаборант:<span class="required"> *</span></p>
+            </div>
+
+            <MudSelect T="String" @bind-Value="@userId" Variant="Variant.Outlined" Style="font-size: 16px; margin: 0; margin-bottom: 10px">
+                @foreach (var tutor in Users)
+                {
+                    <MudSelectItem Value="@tutor.Id.ToString()">
+                        @tutor.Surname @tutor.Name @tutor.Patronymic
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <div style="align-items: center; display: inline-block">
+            <MudButton Variant="Variant.Outlined" Style="margin: 5px; font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px" OnClick="AddingNewTask">Сохранить</MudButton>
+            <MudButton Variant="Variant.Outlined" Style="margin: 5px; font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px" OnClick="Close">Закрыть</MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    int countOfSources;
+    int countOfAnalyzes;
+    private DialogOptions closeButton = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false };
+    bool visible;
+
+    List<User> Users;
+    string userId;
+    string taskInfo;
+
+    List<WaterAnalyze.Data.Task> Tasks;
+    private Data.Task selectedItem1 = null;
+
     // После того как все элементы DOM веб страницы загружены...
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
     {
+        
+
         if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("startmap", null);
         }
+
+
     }
 
+    protected override void OnInitialized()
+    {
+        countOfSources = WaterAnalyzeContext.Sources.ToList().Count();
+        countOfAnalyzes = WaterAnalyzeContext.Analyzes.ToList().Count();
+
+        Users = WaterAnalyzeContext.Users.Where(x => x.RoleId == 2).ToList();
+        Update();
+    }
+
+    private void Close()
+    {
+        visible = false;
+    }
+
+    void Update()
+    {
+        if (CurrentUser.CurrentUserData != null && CurrentUser.CurrentUserData.RoleId == 2)
+        {
+            Tasks = WaterAnalyzeContext.Tasks.Where(x => x.UserId == CurrentUser.CurrentUserData.Id && x.IsDone == false).ToList();
+        }
+    }
+
+    public async void RadioButtonChanged(Data.Task task)
+    {
+        task.IsDone = !task.IsDone;
+        WaterAnalyzeContext.Tasks.Update(task);
+        WaterAnalyzeContext.SaveChanges();
+        StateHasChanged();
+        Tasks = null;
+        Update();
+    }
+
+    void AddingNewTask()
+    {
+        if (taskInfo != null && userId != null)
+        {
+            WaterAnalyze.Data.Task newTask = new WaterAnalyze.Data.Task()
+            {
+                Info = taskInfo,
+                IsDone = false,
+                UserId = Convert.ToInt32(userId)
+            };
+
+            WaterAnalyzeContext.Tasks.Add(newTask);
+            WaterAnalyzeContext.SaveChanges();
+            // EducationClubContext.Entry(newClub).State = EntityState.Detached;
+            Snackbar.Add("Задание успешно отправлено!", Severity.Success);
+            visible = false;
+        }
+    }
 }
 
 <style>
@@ -33,10 +177,13 @@
         background-repeat: no-repeat;
         background-size: cover;
     } */
+    body{
+        background-color: #fafafa;
+    }
     #map {
         width: 700px;
-        height: 580px;
-        padding: 0;
-        box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+        height: 600px;
+        padding: 10px;
+        border-radius: 15px;
     }
 </style>

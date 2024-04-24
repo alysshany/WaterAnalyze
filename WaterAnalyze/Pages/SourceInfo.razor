@@ -95,7 +95,7 @@
 		Elements.Reverse();
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
@@ -117,4 +117,7 @@
 		margin-right: auto;
 	}
 
+	body {
+		background-color: #fafafa;
+	}
 </style>

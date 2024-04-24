@@ -7,12 +7,11 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Главная</PageTitle>
-
-<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
-	<div Style="flex: 50%;">
-		<MudImage Src='/img/paperOne.jpg' Style="width: 99%; object-fit: fill"></MudImage>
-	</div>
+  
+<MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; align-self: center; align-items: center; justify-content: center;">
+    <MudCard Elevation="0" Style="flex: 50%; border-radius: 10px; padding: 10px">
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+    </MudCard>
 	<div Style="flex: 50%; ">
         <div>
             <div Class="d-flex mx-auto" style="display: inline-block;">
@@ -29,7 +28,7 @@
         <div Class="d-flex mx-auto" style="display: inline-block;">
             <MudButton Class="d-flex mx-auto" OnClick="AdminRole" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="adminVariant">Администратор</MudButton>
             <MudButton Class="d-flex mx-auto" OnClick="LabRole" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="labVariant">Лаборант</MudButton>
-            <MudButton Class="d-flex mx-auto" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="Variant.Outlined">Заведующий</MudButton>
+            <MudButton Class="d-flex mx-auto" OnClick="ZavRole" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="zavVariant">Заведующий</MudButton>
         </div>
         <br>
         @if (!newOne)
@@ -74,6 +73,7 @@
     Account account;
     Variant adminVariant = new Variant();
     Variant labVariant = new Variant();
+    Variant zavVariant = new Variant();
     string? surname;
     string? name;
     string? patronymic;
@@ -87,6 +87,7 @@
         newOne = true;
         labVariant = Variant.Outlined;
         adminVariant = Variant.Outlined;
+        zavVariant = Variant.Outlined;
 
         if (workerId != null)
         {
@@ -101,11 +102,34 @@
             password = account.Password;
             newOne = false;
 
-            
+            string roleTitle = WaterAnalyzeContext.Roles.Where(x => x.Id == user.RoleId).First().Title;
+
+            switch (roleTitle)
+            {
+                case "Администратор":
+                    role = 1;
+                    adminVariant = Variant.Filled;
+                    labVariant = Variant.Outlined;
+                    zavVariant = Variant.Outlined;
+                    break;
+                case "Лаборант":
+                    role = 2;
+                    adminVariant = Variant.Outlined;
+                    labVariant = Variant.Filled;
+                    zavVariant = Variant.Outlined;
+                    break;
+                case "Заведующий":
+                    role = 1002;
+                    adminVariant = Variant.Outlined;
+                    labVariant = Variant.Outlined;
+                    zavVariant = Variant.Filled;
+                    break;
+            }
+
         }
 
-        adminVariant = Variant.Filled;
-	}
+
+    }
 
     public void DeletingWorker()
     {
@@ -119,6 +143,7 @@
         role = 1;
         adminVariant = Variant.Filled;
         labVariant = Variant.Outlined;
+        zavVariant = Variant.Outlined;
     }
 
     public void LabRole()
@@ -126,6 +151,15 @@
         role = 2;
         adminVariant = Variant.Outlined;
         labVariant = Variant.Filled;
+        zavVariant = Variant.Outlined;
+    }
+
+    public void ZavRole()
+    {
+        role = 1002;
+        adminVariant = Variant.Outlined;
+        labVariant = Variant.Outlined;
+        zavVariant = Variant.Filled;
     }
 
     public void RegistrationLabWorker()
@@ -141,9 +175,14 @@
                 account.Password = password;
                 user.RoleId = role;
 
+                WaterAnalyzeContext.Users.Update(user);
+                WaterAnalyzeContext.Accounts.Update(account);
+                WaterAnalyzeContext.SaveChanges();
+                // WaterAnalyzeContext.ChangeTracker.Clear();
+
                 Snackbar.Add("Изменения сохранены", Severity.Success);
 
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/workerList");
             }
             else
             {
@@ -155,8 +194,34 @@
             if (surname != null && name != null && login != null &&
             password != null && role != null && role != null)
             {
-                if (WaterAnalyzeContext.Accounts.Where(x => x.Login == login).First() == null)
+                if (WaterAnalyzeContext.Accounts.Where(x => x.Login == login).FirstOrDefault() == null)
                 {
+                    User newUser = new User()
+                    {
+                        Surname = surname,
+                        Name = name,
+                        Patronymic = patronymic,
+                        RoleId = role
+                    };
+
+                    WaterAnalyzeContext.Users.Add(newUser);
+                    WaterAnalyzeContext.SaveChanges();
+
+                    Account account = new Account()
+                    {
+                        Login = login,
+                        Password = password,
+                        UserId = newUser.Id
+                    };
+
+                    WaterAnalyzeContext.Accounts.Add(account);
+                    WaterAnalyzeContext.SaveChanges();
+
+                    Snackbar.Add("Успешно", Severity.Success);
+
+                    Navigation.NavigateTo("/workerList");
+
+                    // EducationClubContext.Entry(newClub).State = EntityState.Detached;
                     // User userData = new User()
                     //     {
                     //         Surname = surname,
@@ -186,5 +251,7 @@
 }
 
 <style>
-
+    body {
+        background-color: #fafafa;
+    }
 </style>

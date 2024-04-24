@@ -10,12 +10,14 @@
     <MudSpacer />
     <MudSelect ValueChanged="TypeChange" T="string" Label="Отклонения в концентрации" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
         <MudSelectItem T="string" Value="@("Хлорид ионов")" />
-        <MudSelectItem T="string" Value="@("Ионов магний")" />
-        <MudSelectItem T="string" Value="@("xd")" />
+        <MudSelectItem T="string" Value="@("Ионов магния")" />
+        <MudSelectItem T="string" Value="@("Ионов кальция")" />
+        <MudSelectItem T="string" Value="@("Нефтепродуктов")" />
+        <MudSelectItem T="string" Value="@("Водородного показателя")" />
     </MudSelect>
 </div>
 <div Style="display: flex; width: 80%; height: 18%;margin-left: auto; margin-top: 2%; margin-right: auto; ">
-    <MudCard Style="flex: 80%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+    <MudCard Style="flex: 80%;  border-radius: 15px; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
         <div id="map"></div>
     </MudCard>
 @*     <div Style="flex: 20%; ">
@@ -32,7 +34,7 @@
 @code {
     // После того как все элементы DOM веб страницы загружены...
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -43,7 +45,7 @@
             foreach (var source in sourceList)
             {
                 List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
-                
+
                 var hardness = $"";
                 var sulfat = $"";
                 var chloride = $"";
@@ -52,7 +54,7 @@
                 var oil = $"";
                 var magnesium = $"";
                 var acidityIndex = $"";
-                
+
                 if (analyzeList.Count > 1)
                 {
                     analyzeList.Reverse();
@@ -177,18 +179,185 @@
                     magnesium = $"Магний: {lastAnalyze.Magnesium}";
                     acidityIndex = $"PH: {lastAnalyze.AcidityIndex}";
                 }
-                await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY, source.Title);
+                await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY, source.Title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex);
             }
         }
     }
 
-    public void TypeChange(string selected)
+    public async void TypeChange(string selected)
     {
+        List<Source> sourceList = WaterAnalyzeContext.Sources.ToList();
+
         switch (selected)
         {
             case "Хлорид ионов":
+                foreach (var source in sourceList)
+                {
+                    var sourceType = WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title;
+                    if (sourceType == "Река" || sourceType == "Ручей")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Сhloride > 300)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                    else if (sourceType == "Родник" || sourceType == "Колонка" || sourceType == "Колодец" || sourceType == "Арт. Скважина")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Сhloride > 350)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                }
                 break;
-            case "Ионов магний":
+            case "Ионов магния":
+                foreach (var source in sourceList)
+                {
+                    var sourceType = WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title;
+                    if (sourceType == "Река" || sourceType == "Ручей")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Magnesium > 40)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                    else if (sourceType == "Родник" || sourceType == "Колонка" || sourceType == "Колодец" || sourceType == "Арт. Скважина")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Magnesium > 50)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                }
+                break;
+            case "Ионов кальция":
+                foreach (var source in sourceList)
+                {
+                    var sourceType = WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title;
+                    if (sourceType == "Река" || sourceType == "Ручей")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Calcium > 180)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                    else if (sourceType == "Родник" || sourceType == "Колонка" || sourceType == "Колодец" || sourceType == "Арт. Скважина")
+                    {
+                        // List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        // analyzeList.Reverse();
+                        // var lastAnalyze = analyzeList[0];
+
+                        // if (lastAnalyze.Calcium > 50)
+                        // {
+                        //     await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                        // }
+                    }
+                }
+                break;
+
+            case "Нефтепродуктов":
+                foreach (var source in sourceList)
+                {
+                    var sourceType = WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title;
+                    if (sourceType == "Река" || sourceType == "Ручей")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Oil > 0.05)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                    else if (sourceType == "Родник" || sourceType == "Колонка" || sourceType == "Колодец" || sourceType == "Арт. Скважина")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.Oil > 0.1)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                }
+                break;
+
+            case "Водородного показателя":
+                foreach (var source in sourceList)
+                {
+                    var sourceType = WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title;
+                    if (sourceType == "Река" || sourceType == "Ручей")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.AcidityIndex > 9 || lastAnalyze.AcidityIndex < 6)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                    else if (sourceType == "Родник" || sourceType == "Колонка" || sourceType == "Колодец" || sourceType == "Арт. Скважина")
+                    {
+                        List<Analyze> analyzeList = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == source.Id).ToList();
+                        analyzeList.Reverse();
+                        if (analyzeList.Count != 0)
+                        {
+                            var lastAnalyze = analyzeList[0];
+
+                            if (lastAnalyze.AcidityIndex > 8.5 || lastAnalyze.AcidityIndex < 6.5)
+                            {
+                                await JSRuntime.InvokeVoidAsync("startAddingBaloon", source.CoordinatesX, source.CoordinatesY);
+                            }
+                        }
+                    }
+                }
                 break;
 
         }
@@ -197,6 +366,9 @@
 }
 
 <style>
+    body {
+        background-color: #fafafa;
+    }
     #map {
         width: 1300px;
         height: 500px;

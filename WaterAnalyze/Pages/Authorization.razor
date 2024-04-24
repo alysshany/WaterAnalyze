@@ -9,14 +9,14 @@
 
 <PageTitle>Авторизация</PageTitle>
 
-<MudCard Style="display: flex; width: 70%; height: 30%; margin-left: auto;margin-right: auto; margin-top: 5%; align-self: center; align-items: center; justify-content: center; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; overflow: hidden">
-    <div Style="flex: 50%;">
-        <MudImage Src='/img/paperOne.jpg' Style="width: 99%; object-fit: fill"></MudImage>
-    </div>
+<MudCard Elevation="5" Style="display: flex; border-radius: 15px;  width: 90%; margin-left: auto;margin-right: auto; margin-top: 1%; align-self: center; align-items: center; justify-content: center; overflow: hidden">
+    <MudCard Elevation="0" Style="flex: 50%; border-radius: 10px; padding: 10px">
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+    </MudCard>
     <div Style="flex: 50%; ">
-        <MudTextField T="string" Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
+        <MudTextField T="string"  Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
         <MudTextField T="string" InputType=InputType.Password Label="Пароль" Variant="Variant.Outlined" @bind-Value="password"></MudTextField>
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" OnClick="ToAutho">Войти</MudButton>
+        <MudButton Variant="Variant.Outlined" Style="border-radius: 10px;" Color="Color.Primary" Class="d-flex mx-auto" OnClick="ToAutho">Войти</MudButton>
     </div>
 </MudCard>
 
@@ -50,7 +50,9 @@
 }
 
 <style>
-
+    body {
+        background-color: #fafafa;
+    }
     /* #map {
         width: 900px;
         height: 600px;

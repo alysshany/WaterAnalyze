@@ -4,11 +4,11 @@
 @page "/analyzeList"
 
 
-<MudCard Style="display: flex; width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px; ">
-    <div Style="flex: 50%;">
-        <MudImage Src='/img/paperOne.jpg' Style="width: 99%; object-fit: fill"></MudImage>
-    </div>
-    <div Style="flex: 50%;">
+<MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
+    <MudCard Elevation="0" Style="flex: 30%; border-radius: 10px; padding: 10px">
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+    </MudCard>
+    <div Style="flex: 70%;">
         <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
                     Items="@Elements"
                     GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
@@ -48,7 +48,7 @@
 
     private IEnumerable<Analyze> Elements = new List<Analyze>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
         Elements = WaterAnalyzeContext.Analyzes.ToList();
     }
@@ -78,3 +78,9 @@
         Navigation.NavigateTo($"/analyzeInfo/{analyze}");
     }
 }
+
+<style>
+    body {
+        background-color: #fafafa;
+    }
+</style>

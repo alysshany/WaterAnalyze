@@ -7,7 +7,7 @@
 
 <PageTitle>Главная</PageTitle>
 
-<MudGrid Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+<MudGrid Style="width: 90%; height: 40%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
 	<MudItem xs="6" Style="height: 300px;">
 		<MudPaper>
 			<div id="map"></div>
@@ -75,6 +75,19 @@
 				}
 			}
 			<MudField>Сульфаты <MudButton Color="Color.Primary" OnClick="@(()=> sulfatView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> sulfatView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudField>
+			@if (sulfatView)
+			{
+				<MudPaper Style="display: inline-block;" Class="d-flex mx-auto">
+					<MudTextField ValueChanged="SulfatChange" @bind-Text="firstSulfat" T="String" Label="Коэф(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+					<MudTextField ValueChanged="SulfatChange" @bind-Text="secondSulfat" T="String" Label="Коэф(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+					<MudTextField @bind-Value="resultSulfat" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+				</MudPaper>
+
+				@if (resultSulfat != null && resultSulfat != "0" && (Math.Abs(Convert.ToDouble(firstSulfatRes) - Convert.ToDouble(secondSulfatRes))) > (17 * (Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes))) / 200 && (Math.Abs(Convert.ToDouble(firstSulfatRes) - Convert.ToDouble(secondSulfatRes))) > (11 * (Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes))) / 200)
+				{
+					<MudText>Анализ необходимо переделать, значения неверные</MudText>
+				}
+			}
 			<MudField>Кальций <MudButton Color="Color.Primary" OnClick="@(()=> calciyView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> calciyView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudField>
 			@if (calciyView)
 			{
@@ -265,6 +278,12 @@
 	string secondHardnessRes;
 	string resultHardness;
 
+	string firstSulfat;
+	string secondSulfat;
+	string firstSulfatRes;
+	string secondSulfatRes;
+	string resultSulfat;
+
 	string firstOil;
 	string secondOil;
 	string resultOil;
@@ -305,7 +324,7 @@
 	// 	}
 	// }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
 	{
 		newOne = true;
 		sourceTypes = WaterAnalyzeContext.SourceTypes.ToList();
@@ -325,6 +344,17 @@
 		}
 
 
+	}
+
+	public void SulfatChange()
+	{
+
+		if (firstSulfat != "" && secondSulfat != "")
+		{
+			firstSulfatRes = ((1000 * Convert.ToDouble(firstSulfat)) / 10).ToString();
+			secondSulfatRes = ((1000 * Convert.ToDouble(secondSulfat)) / 10).ToString();
+			resultSulfat = ((Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes)) / 2).ToString();
+		}
 	}
 
 	public void GidrocorbonatChange()
@@ -427,6 +457,9 @@
 }
 
 <style>
+	body {
+		background-color: #fafafa;
+	}
 	#map {
 		width: 500px;
 		height: 300px;

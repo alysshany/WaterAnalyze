@@ -11,14 +11,14 @@
 <MudCard Elevation="5" style="display:flex; width: 90%; margin-left: auto;  margin-right: auto; margin-top: 1%; border-radius: 15px; align-self: center; align-items: center; justify-content: center;   ">
     <MudCard Elevation="0" Style="flex: 50%; display: inline-block;" >
         <MudCard Elevation="0" Class="d-flex mx-auto">
-            <MudCard Elevation="5" Style="background-color: #4f97c2; border-radius: 10px; width:50%; height: 250px; margin-bottom: 5%; margin-left: 5%">
+            <MudCard Elevation="5" Style="background-color: #4f97c2; border-radius: 10px; width:50%; height: 250px; margin-bottom: 5%; margin-left: 5%; align-self: center; align-items: center; justify-content: center; ">
                 @if (CurrentUser.CurrentUserData != null && CurrentUser.CurrentUserData.RoleId == 1002)
                 {
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px" OnClick="() => visible = true">Добавить задание</MudButton>
+                    <MudButton Class="d-flex mx-auto" Variant="Variant.Filled" Color="Color.Secondary" Style="align-self: center; color: black; border-radius: 10px; margin-left:5px" OnClick="() => visible = true">Добавить задание</MudButton>
                 }
                 @if (CurrentUser.CurrentUserData != null && CurrentUser.CurrentUserData.RoleId == 2)
                 {
-                    <MudTable Elevation="5" Items="@Tasks" @bind-SelectedItem="selectedItem1" Height="auto" Style="overflow: scroll;">
+                    <MudTable Elevation="5" Class="d-flex mx-auto" Items="@Tasks" @bind-SelectedItem="selectedItem1"  Style="overflow: scroll; width: 95%; height: 97%; margin-top: 1%">
                         <HeaderContent>
                             <MudTh>Описание</MudTh>
                             <MudTh>Выполнение</MudTh>
@@ -55,7 +55,7 @@
     </div>
 </MudCard>
 
-<MudDialog Class="content" @bind-IsVisible="visible" Options="closeButton">
+<MudDialog Class="content" @bind-IsVisible="visible" Options="closeButton" Style="width: 30%">
     <TitleContent>
         <MudText Style="font-size: 18px">
                 Добавление задания:
@@ -131,6 +131,8 @@
     private void Close()
     {
         visible = false;
+        userId = null;
+        taskInfo = null;
     }
 
     void Update()
@@ -167,6 +169,8 @@
             // EducationClubContext.Entry(newClub).State = EntityState.Detached;
             Snackbar.Add("Задание успешно отправлено!", Severity.Success);
             visible = false;
+            userId = null;
+            taskInfo = null;
         }
     }
 }

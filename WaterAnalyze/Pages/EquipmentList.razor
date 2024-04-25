@@ -6,7 +6,7 @@
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; ">
     <MudCard Elevation="0" Style="flex: 30%; border-radius: 10px; padding: 10px">
-        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 600px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
     </MudCard>
     <div Style="flex: 70%;">
         <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
@@ -28,12 +28,30 @@
             </HeaderContent>  *@
             <RowTemplate>
                 <MudTd>
-                    <MudCard @onclick="() => NavigationToEditingWorker(context.Id.ToString())">
-                        <MudCardContent>
-                            <MudText>@context.Title </MudText>
-                            <MudText Typo="Typo.body2"></MudText>
-                        </MudCardContent>
-                    </MudCard>
+                    @if (context.DateEnd <= DateTime.Today)
+                    {
+                        <MudCard Style="background-color: #FF9C9C">
+                            <MudCardContent>
+                                <MudText>@context.Title </MudText>
+                                <MudText Typo="Typo.body2">ГОСТ: @context.DocumentNumber</MudText>
+                                <MudText Typo="Typo.body2">Регистрация: @context.DateBegin.Value.ToShortDateString()</MudText>
+                                <MudText Typo="Typo.body2">Списание: @context.DateEnd.Value.ToShortDateString()</MudText>
+                                <MudText Typo="Typo.body2">Ответсвенный: @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Patronymic</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    }
+                    else
+                    {
+                        <MudCard>
+                            <MudCardContent>
+                                <MudText>@context.Title </MudText>
+                                <MudText Typo="Typo.body2">ГОСТ: @context.DocumentNumber</MudText>
+                                <MudText Typo="Typo.body2">Регистрация: @context.DateBegin.Value.ToShortDateString()</MudText>
+                                <MudText Typo="Typo.body2">Списание: @context.DateEnd.Value.ToShortDateString()</MudText>
+                                <MudText Typo="Typo.body2">Ответсвенный: @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Patronymic</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    }
                 </MudTd>
                 @* <MudTd @onclick="() => NavigationToEditingWorker(context.Id.ToString())" DataLabel="Фамилия">@context.Surname</MudTd>
                 <MudTd @onclick="() => NavigationToEditingWorker(context.Id.ToString())" DataLabel="Имя">@context.Name</MudTd>
@@ -77,10 +95,6 @@
         return false;
     }
 
-    public void NavigationToEditingWorker(string worker)
-    {
-        Navigation.NavigateTo($"/workerInfo/{worker}");
-    }
 }
 
 <style>

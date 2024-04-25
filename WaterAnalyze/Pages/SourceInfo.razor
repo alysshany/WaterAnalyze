@@ -7,33 +7,75 @@
 
 <PageTitle>Главная</PageTitle>
 
-<MudGrid Style="width: 70%; height: 30%;margin-left: auto;margin-right: auto; margin-top: 5%; box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+<MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
+<MudGrid >
 	<MudItem xs="6" >
-		<MudPaper >
+			<MudPaper Style="border-radius: 10px;  margin-left: 2%; margin-right: 2%; margin-top: 2%">
 			<div id="map"></div>
 		</MudPaper>
 	</MudItem>
 	<MudItem xs="6" >
-		<MudPaper >
-			<MudTextField Label="Название" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@source.Title" Disabled=true></MudTextField>
-			<MudTextField Label="Время, чтобы добраться" Variant="Variant.Text" T="TimeSpan?" Margin="Margin.Dense" @bind-Value="@source.TravelTime" Disabled=true></MudTextField>
-			<MudTextField Label="Направление" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title" Disabled=true></MudTextField>
-			<MudTextField Label="Тип" Variant="Variant.Text" T="string" Margin="Margin.Dense" @bind-Value="@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title" Disabled=true></MudTextField>
+			<MudPaper Elevation="0">
+				<MudCard Elevation="5"  Style="background-color: #e5e5e5; border-radius: 10px; margin: 2%;">
+					
+					<MudPaper Elevation="0" Style="background-color: #e5e5e5; margin: 2%; padding: 1%;  ">
+						
+						<MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="padding: 3%; color: black; border-radius: 10px; margin: 2%" Class="d-flex mx-auto">@source.Title</MudButton>
+					</MudPaper>
+
+				</MudCard>
+				<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
+					<MudPaper Elevation="0" Style="flex: 50%; ">
+						<MudText Style=" margin: 1%; text-align:center">Направление</MudText>
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px">
+
+							<MudText Typo="Typo.body2" Style="color: white; text-align: center" @bind-Value="@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title">@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title</MudText>
+						</MudPaper>
+					</MudPaper>
+					<MudPaper Elevation="0" Style="flex: 50%; ">
+						<MudText Style=" margin: 1%; text-align:center">Время</MudText>
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px">
+
+							<MudText Style=" text-align: center" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
+						</MudPaper>
+					</MudPaper>
+				</MudCard>
+
+				<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
+					<MudPaper Elevation="0" Style="flex: 50%; ">
+						<MudText Style=" margin: 1%; text-align:center">Тип</MudText>
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px">
+
+							<MudText Style="text-align: center">@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title</MudText>
+						</MudPaper>
+					</MudPaper>
+					<MudPaper Elevation="0" Style="flex: 50%; ">
+						<MudText Style=" margin: 1%; text-align:center">Время</MudText>
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px">
+
+							<MudText Style="color: white; text-align: center" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
+						</MudPaper>
+					</MudPaper>
+				</MudCard>
+			
 		</MudPaper>
+			
 	</MudItem>
 	<MudItem xs="12">
 		<div>
-			@if (CurrentUser.CurrentUserData != null)
-			{
-				if (CurrentUser.CurrentUserData.RoleId == 2)
+			<MudPaper Class="d-flex mx-auto">
+				<MudText Style="text-align: center; margin: 1%;">Информация по последнему анализу</MudText>
+				@if (CurrentUser.CurrentUserData != null)
 				{
-					<MudButton Color="Color.Primary" Href="/analyzeInfo" Style="margin-bottom: 2%;">Добавить анализ</MudButton>
+					if (CurrentUser.CurrentUserData.RoleId == 2)
+					{
+							<MudButton Class="d-flex mx-auto" Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px;margin-bottom: 2%;"  Href="/analyzeInfo">Добавить анализ</MudButton>
+					}
 				}
-			}
-			
+			</MudPaper>
 			@if (Elements.Count != 0)
 			{
-				<MudTable Items="@Elements.Take(1)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+				<MudTable Elevation="5" Items="@Elements.Take(1)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
 					<HeaderContent>
 						<MudTh>Дата отбора</MudTh>
 						<MudTh>Дата проведения</MudTh>
@@ -63,6 +105,7 @@
 		</div>
 	</MudItem>
 </MudGrid>
+</MudCard>
 
 @* <MudGrid Style="width: 60%; height: 30%;display: block;margin-left: auto;margin-right: auto; margin-top: 2%;">
     <MudItem xs="12">
@@ -108,13 +151,14 @@
 
 <style>
 	#map {
-		width: 500px;
-		height: 300px;
+		width: 650px;
+		height: 420px;
 		padding: 0;
 		margin-top: 2%;
 		display: block;
 		margin-left: auto;
 		margin-right: auto;
+		border-radius: 10px;
 	}
 
 	body {

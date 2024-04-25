@@ -9,7 +9,7 @@
 <MudLayout>
     <MudAppBar Color="Color.Transparent" Elevation="0">
         <MudContainer>
-            <MudButton  OnClick="ToLogOut">ClearWater</MudButton>
+            <MudButton Href="/">ClearWater</MudButton>
         </MudContainer>
         <MudContainer Style="display: flex; justify-content: right;">
             @if (CurrentUser.CurrentUserData != null)
@@ -29,6 +29,7 @@
                 {
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px" Href="/analyzeList">Анализы</MudButton>
                 }
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px" OnClick="ToLogOut">Выход</MudButton>
             }
             else
             {
@@ -74,6 +75,7 @@
     public void ToLogOut()
     {
         CurrentUser.CurrentUserData = null;
+        Navigation.NavigateTo($"/autho");
         Navigation.NavigateTo($"/");
     }
 

@@ -6,7 +6,7 @@
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
     <MudCard Elevation="0" Style="flex: 30%; border-radius: 10px; padding: 10px">
-        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 600px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
     </MudCard>
     <div Style="flex: 70%;">
         <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
@@ -31,9 +31,9 @@
             </HeaderContent>
             <RowTemplate >
                 <MudTd @onclick="() => NavigationToEditingAnalyze(context.Id.ToString())" DataLabel="Дата проведения анализа">@context.DateOfSelection.Value.ToShortDateString()</MudTd>
-                <MudTd DataLabel="Направление">@WaterAnalyzeContext.Directions.Where(x => x.Id == WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().DirectionId).First().Title</MudTd>
-                <MudTd DataLabel="Источник">@WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().Title</MudTd>
-                <MudTd DataLabel="Частота отбора"> @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name</MudTd>
+                <MudTd @onclick="() => NavigationToEditingAnalyze(context.Id.ToString())" DataLabel="Направление">@WaterAnalyzeContext.Directions.Where(x => x.Id == WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().DirectionId).First().Title</MudTd>
+                <MudTd @onclick="() => NavigationToEditingAnalyze(context.Id.ToString())" DataLabel="Источник">@WaterAnalyzeContext.Sources.Where(x => x.Id == context.SourceId).First().Title</MudTd>
+                <MudTd @onclick="() => NavigationToEditingAnalyze(context.Id.ToString())" DataLabel="Частота отбора"> @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name</MudTd>
             </RowTemplate>
         @*     <GroupFooterTemplate>
                 <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="5">Total Mass: @context.Items.Sum((e) => e.Molar)</MudTh>

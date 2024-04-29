@@ -180,12 +180,14 @@
                     acidityIndex = $"PH: {lastAnalyze.AcidityIndex}";
                 }
                 await JSRuntime.InvokeVoidAsync("startAddingObjects", source.CoordinatesX, source.CoordinatesY, source.Title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex);
+
             }
         }
     }
 
     public async void TypeChange(string selected)
     {
+        await JSRuntime.InvokeVoidAsync("deleteGeo");
         List<Source> sourceList = WaterAnalyzeContext.Sources.ToList();
 
         switch (selected)

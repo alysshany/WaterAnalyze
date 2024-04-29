@@ -2,8 +2,11 @@
 @page "/analyzeInfo/{analyzeId}"
 @using Data
 @using Microsoft.JSInterop
+@inject ISnackbar Snackbar
 @inject WaterAnalyzeContext WaterAnalyzeContext
+@inject CurrentUser CurrentUser
 @inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
 
 <PageTitle>Главная</PageTitle>
 
@@ -12,7 +15,7 @@
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
 <MudGrid >
 	<MudItem xs="6">
-			<MudPaper Elevation="5" Style="border-radius: 10px; background-color: #4f97c2; margin-left: 2%; margin-right: 2%; margin-top: 2%">
+			<MudPaper Elevation="5" Style="border-radius: 10px; background-color: #72abce; margin-left: 2%; margin-right: 2%; margin-top: 2%">
 @* 			@if (sourceTitle == null)
 			{
 				<MudImage Src='/img/colb.jpg' Style=" object-fit: cover; overflow:hidden; height: 400px; width: 100%; border-radius: 10px;"></MudImage>
@@ -52,12 +55,61 @@
 				</MudCard>
 			}
 			else{
-				<MudCard Elevation="5" Style="background-color: #e5e5e5; border-radius: 10px; margin: 2%;">
+				@* <MudCard Elevation="5" Style="background-color: #e5e5e5; border-radius: 10px; margin: 2%;">
 					<div Class="d-flex mx-auto" style="display: inline-block; padding: 1%;">
 						<MudText>@source.Title</MudText>
+						<MudText>@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title</MudText>
+						<MudText>@analyze.DateOfSelection.Value.ToShortDateString()</MudText>
+						<MudText>@analyze.Date.Value.ToShortDateString()</MudText>
+						<MudText>@WaterAnalyzeContext.Samples.Where(x => x.Id == analyze.SampleId).First().Value</MudText>
 					</div>
 					
-				</MudCard>
+				</MudCard> *@
+
+				<MudPaper Elevation="0">
+					<MudCard Elevation="5" Style="background-color: #e5e5e5; border-radius: 10px; margin: 2%;">
+
+						<MudPaper Elevation="0" Style="background-color: #e5e5e5; margin: 2%; padding: 1%;  ">
+
+							<MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="padding: 3%; color: black; border-radius: 10px; margin: 2%" Class="d-flex mx-auto">@source.Title</MudButton>
+						</MudPaper>
+
+					</MudCard>
+					<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
+						<MudPaper Elevation="0" Style="flex: 50%; ">
+							<MudText Style=" margin: 1%; text-align:center">Дата взятия пробы</MudText>
+							<MudPaper Elevation="5" Style="flex: 50%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+								<MudText Typo="Typo.body2" Style="color: white; text-align: center; font-size: 18px; ">@analyze.DateOfSelection.Value.ToShortDateString()</MudText>
+							</MudPaper>
+						</MudPaper>
+						<MudPaper Elevation="0" Style="flex: 50%; ">
+							<MudText Style=" margin: 1%; text-align:center">Дата проведения анализа</MudText>
+							<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+								<MudText Typo="Typo.body2" Style=" text-align: center;font-size: 18px; ">@analyze.Date.Value.ToShortDateString()</MudText>
+							</MudPaper>
+						</MudPaper>
+					</MudCard>
+
+					<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
+						<MudPaper Elevation="0" Style="flex: 50%; ">
+							<MudText Style=" margin: 1%; text-align:center">Тип</MudText>
+							<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+								<MudText Style="text-align: center; font-size: 18px; ">@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title</MudText>
+							</MudPaper>
+						</MudPaper>
+						<MudPaper Elevation="0" Style="flex: 50%; ">
+							<MudText Style=" margin: 1%; text-align:center">Объем</MudText>
+							<MudPaper Elevation="5" Style="flex: 50%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+								<MudText Style="color: white; text-align: center; font-size: 18px; ">@WaterAnalyzeContext.Samples.Where(x => x.Id == analyze.SampleId).First().Value</MudText>
+							</MudPaper>
+						</MudPaper>
+					</MudCard>
+
+				</MudPaper>
 			}
 			@if (!newOne)
 			{
@@ -69,7 +121,7 @@
 			}
 			else
 			{
-				<MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" Style="margin: 15px; font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;">
+				<MudButton Variant="Variant.Outlined" OnClick="SavingAnalyze" Color="Color.Primary" Class="d-flex mx-auto" Style="margin: 15px; font-size: 16px; width: 30%; ">
 					Сохранить
 				</MudButton>
 			}
@@ -83,36 +135,36 @@
 		{
 				@if (_selected == 1)
 				{
-					<MudText Style="margin-left: 1%">Хлориды <MudButton Color ="Color.Primary" OnClick="@(()=> chlorideView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> chlorideView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
+
+					<MudText Style="margin-left: 1%">Хлориды <a href="/files/Хлориды.pdf">(ПНД Ф)</a> <MudButton Color="Color.Primary" OnClick="@(()=> chlorideView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> chlorideView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
 					@if (chlorideView)
 					{
 						<MudPaper Style="display: inline-block; margin-left: 1%" Class="d-flex mx-auto">
-							<MudTextField ValueChanged="ChlorideChange" @bind-Text="firstChloride" T="String" Label="Объем раствора нитрата ртути, пошедший на титрование(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="ChlorideChange" @bind-Text="secondChloride" T="String" Label="Объем раствора нитрата ртути, пошедший на титрование(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="ChlorideChange" @bind-Text="thirdChloride" T="String" Label="Молярная концентрация эквивалента раствора" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField @bind-Value="resultChloride" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
-
+							<MudTextField TextChanged="ChlorideChange" @bind-Value="firstChloride" T="String" Label="Объем нитрата ртути(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="ChlorideChange" @bind-Value="secondChloride" T="String" Label="Объем нитрата ртути(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="ChlorideChange" @bind-Value="thirdChloride" T="String" Label="Молярная концентрация раствора" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField ReadOnly="true" T="String" @bind-Value="resultChloride"></MudTextField>
 						</MudPaper>
 						@if (resultChloride != null && resultChloride != "0" && Math.Abs(Convert.ToDouble(firstChlorideRes) - Convert.ToDouble(secondChlorideRes)) > 0.1 * Convert.ToDouble(resultChloride))
 						{
-							<MudText>Анализ необходимо переделать, значения неверные</MudText>
+							<MudText Style="margin-left: 1%">Анализ необходимо переделать, значения неверные</MudText>
 						}
 					}
 				}
 				if (_selected == 2)
 				{
-					<MudText Style="margin-left: 1%">Гидрокарбонаты <MudButton Color="Color.Primary" OnClick="@(()=> gidrocorbonatView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> gidrocorbonatView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
+					<MudText Style="margin-left: 1%">Гидрокарбонаты <a href="/files/Гидрокарбонат.pdf">(ПНД Ф)</a> <MudButton Color="Color.Primary" OnClick="@(()=> gidrocorbonatView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> gidrocorbonatView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
 					@if (gidrocorbonatView)
 					{
 						<MudPaper Style="display: inline-block;" Class="d-flex mx-auto">
-							<MudTextField ValueChanged="GidrocorbonatChange" @bind-Text="firstGidrocorbonat" T="String" Label="Объем раствора кислоты(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="GidrocorbonatChange" @bind-Text="secondGidrocorbonat" T="String" Label="Объем раствора буры(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="GidrocorbonatChange" @bind-Text="thirdGidrocorbonat" T="String" Label="Объем раствора кислоты(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="GidrocorbonatChange" @bind-Text="fourthGidrocorbonat" T="String" Label="Объем раствора буры(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField @bind-Value="resultGidrocorbonat" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="GidrocorbonatChange" @bind-Value="firstGidrocorbonat" T="String" Label="Объем раствора кислоты(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="GidrocorbonatChange" @bind-Value="secondGidrocorbonat" T="String" Label="Объем раствора буры(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="GidrocorbonatChange" @bind-Value="thirdGidrocorbonat" T="String" Label="Объем раствора кислоты(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="GidrocorbonatChange" @bind-Value="fourthGidrocorbonat" T="String" Label="Объем раствора буры(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField ReadOnly="true" @bind-Value="resultGidrocorbonat" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 						</MudPaper>
 
-						@if (resultGidrocorbonat != null && resultGidrocorbonat != "0" && ((200 * Math.Abs(Convert.ToDouble(firstGidrocorbonatRes) - Convert.ToDouble(secondGidrocorbonatRes))) / Convert.ToDouble(firstGidrocorbonatRes) + Convert.ToDouble(secondGidrocorbonatRes)) > 8)
+						@if (resultGidrocorbonat != null && resultGidrocorbonat != "0" && ((200 * (Math.Abs(Convert.ToDouble(firstGidrocorbonatRes) - Convert.ToDouble(secondGidrocorbonatRes)))) / (Convert.ToDouble(firstGidrocorbonatRes) + Convert.ToDouble(secondGidrocorbonatRes))) > 8)
 						{
 							<MudText>Анализ необходимо переделать, значения неверные</MudText>
 						}
@@ -120,8 +172,7 @@
 				}
 				@if (_selected == 3)
 				{
-					<MudText Style="margin-left: 1%">
-						Сульфаты <MudButton Color="Color.Primary" OnClick
+					<MudText Style="margin-left: 1%">Сульфаты <MudButton Color="Color.Primary" OnClick
 						="@(()=> sulfatView = false)" Style
 						="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick
 						="@(()=> sulfatView = true)" Color
@@ -132,9 +183,9 @@
 						<MudPaper Style
 						="display: inline-block;" Class
 						="d-flex mx-auto">
-							<MudTextField ValueChanged="SulfatChange" @bind-Text="firstSulfat" T="String" Label="Коэф(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="SulfatChange" @bind-Text="secondSulfat" T="String" Label="Коэф(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField @bind-Value="resultSulfat" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="SulfatChange" @bind-Value="firstSulfat" T="String" Label="Коэф(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="SulfatChange" @bind-Value="secondSulfat" T="String" Label="Коэф(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField ReadOnly="true" @bind-Value="resultSulfat" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 						</MudPaper>
 
 						@if (resultSulfat != null && resultSulfat != "0" && (Math.Abs(Convert.ToDouble(firstSulfatRes) - Convert.ToDouble(secondSulfatRes))) > (17 * (Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes))) / 200 && (Math.Abs(Convert.ToDouble(firstSulfatRes) - Convert.ToDouble(secondSulfatRes))) > (11 * (Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes))) / 200)
@@ -145,18 +196,18 @@
 				}
 				@if (_selected == 4)
 				{
-					<MudText Style="margin-left: 1%">Кальций <MudButton Color="Color.Primary" OnClick="@(()=> calciyView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> calciyView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
+					<MudText Style="margin-left: 1%">Кальций <a href="/files/Кальций.pdf">(ПНД Ф)</a> <MudButton Color="Color.Primary" OnClick="@(()=> calciyView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> calciyView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
 					@if (calciyView)
 					{
 						<MudPaper Style
 						="display: inline-block;" Class
 						="d-flex mx-auto">
-							<MudTextField ValueChanged="CalciyChange" @bind-Text="firstCalciy" T="String" Label="Объем раствора трилона(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="CalciyChange" @bind-Text="secondCalciy" T="String" Label="Объем раствора трилона(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="CalciyChange" @bind-Value="firstCalciy" T="String" Label="Объем раствора трилона(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="CalciyChange" @bind-Value="secondCalciy" T="String" Label="Объем раствора трилона(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
 							<MudTextField @bind-Value="resultCalciy" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 						</MudPaper>
 
-						@if (resultCalciy != null && resultCalciy != "0" && ((Math.Abs(Convert.ToDouble(firstCalciyRes) - Convert.ToDouble(secondCalciyRes))) / Convert.ToDouble(firstCalciyRes) + Convert.ToDouble(secondCalciyRes)) * 200 > 8)
+						@if (resultCalciy != null && resultCalciy != "0" && ((Math.Abs(Convert.ToDouble(firstCalciyRes) - Convert.ToDouble(secondCalciyRes))) / (Convert.ToDouble(firstCalciyRes) + Convert.ToDouble(secondCalciyRes))) * 200 > 8)
 						{
 							<MudText>Анализ необходимо переделать, значения неверные</MudText>
 						}
@@ -165,20 +216,29 @@
 				}
 				if (_selected == 5)
 				{
-					<MudText Style="margin-left: 1%">Магний <MudButton Color="Color.Primary" OnClick="@(()=> magniyView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> magniyView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
-					@if (magniyView)
+					<MudText Style="margin-left: 1%">Жесткость <a href="/files/Жесткость.pdf">(ПНД Ф)</a> <MudButton Color="Color.Primary" OnClick
+						="@(()=> hardnessView = false)" Style
+						="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick
+						="@(()=> hardnessView = true)" Color
+						="Color.Primary" Style
+						="font-size: 10px;">Развернуть</MudButton></MudText>
+					@if (hardnessView)
 					{
-						@* <MudPaper Style="display: inline-block;" Class="d-flex mx-auto">
-					<MudTextField ValueChanged="PHChange" @bind-Text="firstPH" T="String" Label="Первое значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
-					<MudTextField ValueChanged="PHChange" @bind-Text="secondPH" T="String" Label="Второе значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
-					<MudTextField @bind-Value="resultPH" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+						<MudPaper Style="display: inline-block;" Class="d-flex mx-auto">
+							<MudTextField TextChanged="HardnessChange" @bind-Value="firstHardness" T="String" Label="Объем раствора трилона(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="HardnessChange" @bind-Value="secondHardness" T="String" Label="Объем раствора трилона(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField @bind-Value="resultHardness" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+						</MudPaper>
 
-				</MudPaper> *@
+						@if (resultHardness != null && resultHardness != "0" && (((Math.Abs(Convert.ToDouble(firstHardnessRes) - Convert.ToDouble(secondHardnessRes))) / (Convert.ToDouble(firstHardnessRes) + Convert.ToDouble(secondHardnessRes))) * 200) > 6)
+						{
+							<MudText>Анализ необходимо переделать, значения неверные</MudText>
+						}
 					}
 				}
 				@if (_selected == 6)
 				{
-					<MudText Style="margin-left: 1%">PH <MudButton Color
+					<MudText Style="margin-left: 1%">PH <a href="/files/Водородный.pdf">(ПНД Ф)</a> <MudButton Color
 						="Color.Primary" OnClick
 						="@(()=> phView = false)" Style
 						="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick
@@ -190,8 +250,8 @@
 						<MudPaper Style
 						="display: inline-block;" Class
 						="d-flex mx-auto">
-							<MudTextField ValueChanged="PHChange" @bind-Text="firstPH" T="String" Label="Первое значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="PHChange" @bind-Text="secondPH" T="String" Label="Второе значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="PHChange" @bind-Value="firstPH" T="String" Label="Первое значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="PHChange" @bind-Value="secondPH" T="String" Label="Второе значение" Variant="Variant.Outlined" Style="font-size: 12px; " />
 							<MudTextField @bind-Value="resultPH" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 
 						</MudPaper>
@@ -203,56 +263,90 @@
 				}
 				if (_selected == 7)
 				{
-					<MudText Style="margin-left: 1%">Нефтепродукты <MudButton Color="Color.Primary" OnClick="@(()=> oilView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> oilView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
+					<MudText Style="margin-left: 1%">Нефтепродукты <a href="/files/Нефтепродукты.pdf">(ПНД Ф)</a> <MudButton Color="Color.Primary" OnClick="@(()=> oilView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> oilView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
 					@if (oilView)
 					{
 						<MudPaper Style
 						="display: inline-block;" Class
 						="d-flex mx-auto">
-							<MudTextField ValueChanged="OilChange" @bind-Text="firstOil" T="String" Label="Концентрация НП" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="OilChange" @bind-Text="secondOil" T="String" Label="Объем пробы" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="OilChange" @bind-Value="firstOil" T="String" Label="Концентрация НП" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField TextChanged="OilChange" @bind-Value="secondOil" T="String" Label="Объем пробы" Variant="Variant.Outlined" Style="font-size: 12px; " />
 							<MudTextField @bind-Value="resultOil" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 						</MudPaper>
 					}
 				}
 				@if (_selected == 8)
 				{
-					<MudText Style="margin-left: 1%">
-						Жесткость <MudButton Color="Color.Primary" OnClick
-						="@(()=> hardnessView = false)" Style
-						="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick
-						="@(()=> hardnessView = true)" Color
-						="Color.Primary" Style
-						="font-size: 10px;">Развернуть</MudButton></MudText>
-					@if (hardnessView)
+					<MudText Style="margin-left: 1%">Магний <MudButton Color="Color.Primary" OnClick="@(()=> magniyView = false)" Style="font-size: 10px; ">Свернуть</MudButton> <MudButton OnClick="@(()=> magniyView = true)" Color="Color.Primary" Style="font-size: 10px;">Развернуть</MudButton></MudText>
+					@if (magniyView)
 					{
 						<MudPaper Style="display: inline-block;" Class="d-flex mx-auto">
-							<MudTextField ValueChanged="HardnessChange" @bind-Text="firstHardness" T="String" Label="Объем раствора трилона(первое значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField ValueChanged="HardnessChange" @bind-Text="secondHardness" T="String" Label="Объем раствора трилона(второе значение)" Variant="Variant.Outlined" Style="font-size: 12px; " />
-							<MudTextField @bind-Value="resultHardness" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
+							<MudTextField @bind-Value="resultMagniy" T="String" Label="Результат" Variant="Variant.Outlined" Style="font-size: 12px; " />
 						</MudPaper>
-
-						@if (resultHardness != null && resultHardness != "0" && ((Math.Abs(Convert.ToDouble(firstHardnessRes) - Convert.ToDouble(secondHardnessRes))) / Convert.ToDouble(firstHardnessRes) + Convert.ToDouble(secondHardnessRes)) * 200 > 6)
-						{
-							<MudText>Анализ необходимо переделать, значения неверные</MudText>
-						}
 					}
 				}
 
 		}
 		else
 		{
-					
-				<MudTd DataLabel="Дата отбора">@analyze.DateOfSelection.Value.ToShortDateString()</MudTd>
-				<MudTd DataLabel="Дата проведения">@analyze.Date.Value.ToShortDateString()</MudTd>
-			<MudTd DataLabel="PH">@analyze.AcidityIndex</MudTd>
-			<MudTd DataLabel="Общая жесткость">@analyze.Hardness</MudTd>
-				<MudTd DataLabel="Cl">@analyze.Сhloride</MudTd>
-				<MudTd DataLabel="HCO3">@analyze.Gidrocorbonat</MudTd>
-				<MudTd DataLabel="SO4">@analyze.Sulfate</MudTd>
-				<MudTd DataLabel="Ca">@analyze.Calcium</MudTd>
-				<MudTd DataLabel="Mg">@analyze.Magnesium</MudTd>
-				<MudTd DataLabel="Нефть">@analyze.Oil</MudTd>
+			<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+					<MudText Style=" margin: 1%; text-align:center">PH</MudText>
+						<MudPaper Elevation="5" Style="flex: 20%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+						<MudText Typo="Typo.body2" Style="color: white; text-align: center">@analyze.AcidityIndex</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+					<MudText Style=" margin: 1%; text-align:center">Жесткость</MudText>
+					<MudPaper Elevation="5" Style="flex: 20%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center">@analyze.Hardness</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+						<MudText Style=" margin: 1%; text-align:center">Cl</MudText>
+						<MudPaper Elevation="5" Style="flex: 20%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center; color: white;">@analyze.Сhloride</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+					<MudText Style=" margin: 1%; text-align:center">HCO3</MudText>
+					<MudPaper Elevation="5" Style="flex: 20%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center">@analyze.Gidrocorbonat</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+						<MudText Style=" margin: 1%; text-align:center">SO4</MudText>
+					<MudPaper Elevation="5" Style="flex: 20%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center; color: white;">@analyze.Sulfate</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+						<MudText Style=" margin: 1%; text-align:center">Ca</MudText>
+					<MudPaper Elevation="5" Style="flex: 20%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center">@analyze.Calcium</MudText>
+					</MudPaper>
+				</MudPaper>
+				<MudPaper Elevation="0" Style="flex: 20%; ">
+						<MudText Style=" margin: 1%; text-align:center">Mg</MudText>
+						<MudPaper Elevation="5" Style="flex: 20%; background-color: #72abce; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center; color: white;">@analyze.Magnesium</MudText>
+					</MudPaper>
+				</MudPaper>
+					<MudPaper Elevation="0" Style="flex: 20%; ">
+						<MudText Style=" margin: 1%; text-align:center">Нефтепродукты</MudText>
+						<MudPaper Elevation="5" Style="flex: 20%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
+
+							<MudText Style=" text-align: center">@analyze.Oil</MudText>
+						</MudPaper>
+					</MudPaper>
+			</MudCard>
 					
 		}
 		@* <div>
@@ -417,6 +511,8 @@
 	string secondGidrocorbonatRes;
 	string resultGidrocorbonat;
 
+	string resultMagniy;
+
 	List<SourceType> sourceTypes = new List<SourceType>();
 	List<Source> sourceTitles = new List<Source>();
 	List<Sample> sampleValues = new List<Sample>();
@@ -474,7 +570,7 @@
 		{
 			firstSulfatRes = ((1000 * Convert.ToDouble(firstSulfat)) / 10).ToString();
 			secondSulfatRes = ((1000 * Convert.ToDouble(secondSulfat)) / 10).ToString();
-			resultSulfat = ((Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes)) / 2).ToString();
+			resultSulfat = Math.Round(((Convert.ToDouble(firstSulfatRes) + Convert.ToDouble(secondSulfatRes)) / 2), 2).ToString();
 		}
 	}
 
@@ -485,7 +581,7 @@
 		{
 			firstGidrocorbonatRes = ((61.02 * (Convert.ToDouble(firstGidrocorbonat) * 0.05 - 2 * Convert.ToDouble(secondGidrocorbonat) * 0.05) * 1000) / 100).ToString();
 			secondGidrocorbonatRes = ((61.02 * (Convert.ToDouble(thirdGidrocorbonat) * 0.05 - 2 * Convert.ToDouble(fourthGidrocorbonat) * 0.05) * 1000) / 100).ToString();
-			resultGidrocorbonat = ((Convert.ToDouble(firstGidrocorbonatRes) + Convert.ToDouble(secondGidrocorbonatRes)) / 2).ToString();
+			resultGidrocorbonat = Math.Round(((Convert.ToDouble(firstGidrocorbonatRes) + Convert.ToDouble(secondGidrocorbonatRes)) / 2), 2).ToString();
 		}
 	}
 
@@ -494,9 +590,10 @@
 
 		if (firstChloride != "" && secondChloride != "" && thirdChloride != "")
 		{
-			firstChlorideRes = (((Convert.ToDouble(firstChloride) - 0.10) * Convert.ToDouble(thirdChloride) * 35.45 * 1000) / 100).ToString();
-			secondChlorideRes = (((Convert.ToDouble(secondChloride) - 0.10) * Convert.ToDouble(thirdChloride) * 35.45 * 1000) / 100).ToString();
-			resultChloride = ((Convert.ToDouble(firstChlorideRes) + Convert.ToDouble(secondChlorideRes)) / 2).ToString();
+			firstChlorideRes = Math.Round((((Convert.ToDouble(firstChloride) - 0.10) * Convert.ToDouble(thirdChloride) * 35.45 * 1000) / 100), 2).ToString();
+			secondChlorideRes = Math.Round((((Convert.ToDouble(secondChloride) - 0.10) * Convert.ToDouble(thirdChloride) * 35.45 * 1000) / 100), 2).ToString();
+			resultChloride = Math.Round(((Convert.ToDouble(firstChlorideRes) + Convert.ToDouble(secondChlorideRes)) / 2), 2).ToString();
+
 		}
 	}
 
@@ -507,7 +604,12 @@
 		{
 			firstCalciyRes = ((40.08 * 0.01 * Convert.ToDouble(firstCalciy) * 1000) / 100).ToString();
 			secondCalciyRes = ((40.08 * 0.01 * Convert.ToDouble(secondCalciy) * 1000) / 100).ToString();
-			resultCalciy = ((Convert.ToDouble(firstCalciyRes) + Convert.ToDouble(secondCalciyRes)) / 2).ToString();
+			resultCalciy = Math.Round(((Convert.ToDouble(firstCalciyRes) + Convert.ToDouble(secondCalciyRes)) / 2), 2).ToString();
+
+			if (resultHardness != null)
+			{
+				resultMagniy = Math.Round((Convert.ToDouble(resultHardness) - (Convert.ToDouble(resultCalciy) / 20.04)), 2).ToString();
+			}
 		}
 	}
 
@@ -516,7 +618,7 @@
 
 		if (firstOil != "" && secondOil != "")
 		{
-			resultOil = ((Convert.ToDouble(firstOil) * 10 * 1) / (Convert.ToDouble(secondOil))).ToString();
+			resultOil = Math.Round(((Convert.ToDouble(firstOil) * 10 * 1) / (Convert.ToDouble(secondOil))), 3).ToString();
 		}
 	}
 
@@ -525,9 +627,14 @@
 
 		if (firstHardness != "" && secondHardness != "")
 		{
-			firstHardnessRes = (50 * 0.01 * 2 * Convert.ToDouble(firstHardness)).ToString();
-			secondHardnessRes = (50 * 0.01 * 2 * Convert.ToDouble(secondHardness)).ToString();
-			resultHardness = ((Convert.ToDouble(firstHardnessRes) * 10 * 1) / (Convert.ToDouble(secondHardnessRes))).ToString();
+			firstHardnessRes = ((0.01 * 2 * 1000 * Convert.ToDouble(firstHardness)) / 50).ToString();
+			secondHardnessRes = ((0.01 * 2 * 1000 * Convert.ToDouble(secondHardness)) / 50).ToString();
+			resultHardness = Math.Round(((Convert.ToDouble(firstHardnessRes) + Convert.ToDouble(secondHardnessRes))/ 2), 2).ToString();
+
+			if (resultCalciy != null)
+			{
+				resultMagniy = Math.Round((Convert.ToDouble(resultHardness) - (Convert.ToDouble(resultCalciy) / 20.04)), 2).ToString();
+			}
 		}
 	}
 
@@ -536,7 +643,7 @@
 
 		if (firstPH != "" && secondPH != "")
 		{
-			resultPH = ((Convert.ToDouble(firstPH) + Convert.ToDouble(secondPH)) / 2).ToString();
+			resultPH = Math.Round(((Convert.ToDouble(firstPH) + Convert.ToDouble(secondPH)) / 2), 2).ToString();
 		}
 	}
 
@@ -574,7 +681,40 @@
 		// }
 	}
 
+	public void SavingAnalyze()
+	{
+		if (resultCalciy != null && resultChloride != null && resultGidrocorbonat != null && resultHardness != null && resultOil != null && resultSulfat != null && resultMagniy != null && sourceTitle != null && date != null && sampleValue != null)
+		{
+			var source = WaterAnalyzeContext.Sources.Where(x => x.Title == sourceTitle).First();
+			var sample = WaterAnalyzeContext.Samples.Where(x => x.Value == sampleValue).First();
 
+			Analyze analyze = new Analyze()
+			{
+				Date = DateTime.Today,
+				AcidityIndex = Convert.ToDouble(resultPH),
+				Hardness = Convert.ToDouble(resultHardness),
+				Сhloride = Convert.ToDouble(resultChloride),
+				Gidrocorbonat = Convert.ToDouble(resultGidrocorbonat),
+				Sulfate = Convert.ToDouble(resultSulfat),
+				Calcium = Convert.ToDouble(resultCalciy),
+				Magnesium = Convert.ToDouble(resultMagniy),
+				Oil = Convert.ToDouble(resultOil),
+				DateOfSelection = date,
+				SampleId = sample.Id,
+				UserId = CurrentUser.CurrentUserData.Id,
+				SourceId = source.Id
+			};
+
+			WaterAnalyzeContext.Analyzes.Add(analyze);
+			WaterAnalyzeContext.SaveChanges();
+			Navigation.NavigateTo("/analyzeList");
+			Snackbar.Add("Изменения сохранены", Severity.Success);
+
+		}
+		else{
+			Snackbar.Add("Не все необходимые поля заполнены.", Severity.Error);
+		}
+	}
 }
 
 <style>

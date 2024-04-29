@@ -27,16 +27,16 @@
 				<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
 					<MudPaper Elevation="0" Style="flex: 50%; ">
 						<MudText Style=" margin: 1%; text-align:center">Направление</MudText>
-						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px">
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
 
-							<MudText Typo="Typo.body2" Style="color: white; text-align: center" @bind-Value="@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title">@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title</MudText>
+							<MudText Style="color: white; text-align: center; font-size: 18px" @bind-Value="@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title">@WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First().Title</MudText>
 						</MudPaper>
 					</MudPaper>
 					<MudPaper Elevation="0" Style="flex: 50%; ">
 						<MudText Style=" margin: 1%; text-align:center">Время</MudText>
-						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px">
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
 
-							<MudText Style=" text-align: center" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
+							<MudText Style=" text-align: center; font-size: 18px" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
 						</MudPaper>
 					</MudPaper>
 				</MudCard>
@@ -44,16 +44,16 @@
 				<MudCard Elevation="0" Style="display: flex;  border-radius: 10px; margin: 2%;">
 					<MudPaper Elevation="0" Style="flex: 50%; ">
 						<MudText Style=" margin: 1%; text-align:center">Тип</MudText>
-						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px">
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #e5e5e5; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
 
-							<MudText Style="text-align: center">@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title</MudText>
+							<MudText Style="text-align: center; font-size: 18px">@WaterAnalyzeContext.SourceTypes.Where(x => x.Id == source.SourceTypeId).First().Title</MudText>
 						</MudPaper>
 					</MudPaper>
 					<MudPaper Elevation="0" Style="flex: 50%; ">
 						<MudText Style=" margin: 1%; text-align:center">Время</MudText>
-						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px">
+						<MudPaper Elevation="5" Style="flex: 50%; background-color: #4f97c2; margin: 2%; height: 70px; display: flex; justify-content: center; align-items: center;">
 
-							<MudText Style="color: white; text-align: center" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
+							<MudText Style="color: white; text-align: center; font-size: 18px" @bind-Value="@source.TravelTime">@source.TravelTime</MudText>
 						</MudPaper>
 					</MudPaper>
 				</MudCard>

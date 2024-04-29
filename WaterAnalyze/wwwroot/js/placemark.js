@@ -1,4 +1,6 @@
 var myMap;
+var myCircle;
+var circles = new Array();
 
 function startmap() {
     // Дождёмся загрузки API и готовности DOM.
@@ -33,13 +35,21 @@ function startAddingBaloon(x, y) {
     ymaps.ready(baloonBuild(x, y));
 }
 
+function deleteGeo() {
+    // Дождёмся загрузки API и готовности DOM.
+    circles.forEach(element => {
+        myMap.geoObjects.remove(element);
+    });
+    
+}
+
 function baloonBuild(x, y) {
 
-    var myCircle = new ymaps.Circle([
+    myCircle = new ymaps.Circle([
         // Координаты центра круга.
         [x, y],
         // Радиус круга в метрах.
-        10
+        3000
     ], {
     }, {
         // Задаем опции круга.
@@ -59,6 +69,8 @@ function baloonBuild(x, y) {
 
     // Добавляем круг на карту.
     myMap.geoObjects.add(myCircle);
+    circles.push(myCircle);
+    
 }
 
 function mapBuild(x, y, title, hardness, sulfat, chloride, calcium, gidrocarbonat, oil, magnesium, acidityIndex) {

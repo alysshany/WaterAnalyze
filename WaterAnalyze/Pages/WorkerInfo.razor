@@ -27,8 +27,8 @@
         <br>
         <div Class="d-flex mx-auto" style="display: inline-block;">
             <MudButton Class="d-flex mx-auto" OnClick="AdminRole" Style="border-radius: 15px; font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="adminVariant">Администратор</MudButton>
-            <MudButton Class="d-flex mx-auto" OnClick="LabRole" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="labVariant">Лаборант</MudButton>
-            <MudButton Class="d-flex mx-auto" OnClick="ZavRole" Style="font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="zavVariant">Заведующий</MudButton>
+            <MudButton Class="d-flex mx-auto" OnClick="LabRole" Style=" border-radius: 15px;font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="labVariant">Лаборант</MudButton>
+            <MudButton Class="d-flex mx-auto" OnClick="ZavRole" Style=" border-radius: 15px;font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" Color="Color.Primary" Variant="zavVariant">Заведующий</MudButton>
         </div>
         <br>
         @if (!newOne)
@@ -133,9 +133,14 @@
 
     public void DeletingWorker()
     {
-        // DBConnection.DeleteUserFromDataBase(user);
-        // navigation.NavigateTo("/workerslist");
-        // Snackbar.Add("Успешно удалено", Severity.Success);
+        user.IsDeleted = true;
+        WaterAnalyzeContext.Users.Update(user);
+        WaterAnalyzeContext.Accounts.Update(account);
+        WaterAnalyzeContext.SaveChanges();
+
+        Snackbar.Add("Изменения сохранены", Severity.Success);
+
+        Navigation.NavigateTo("/workerList");
     }
 
     public void AdminRole()
@@ -201,7 +206,8 @@
                         Surname = surname,
                         Name = name,
                         Patronymic = patronymic,
-                        RoleId = role
+                        RoleId = role,
+                        IsDeleted = false
                     };
 
                     WaterAnalyzeContext.Users.Add(newUser);

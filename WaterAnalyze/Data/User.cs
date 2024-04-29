@@ -15,6 +15,8 @@ public partial class User
 
     public int? RoleId { get; set; }
 
+    public bool? IsDeleted { get; set; }
+
     public virtual ICollection<Account> Accounts { get; set; } = new List<Account>();
 
     public virtual ICollection<Analyze> Analyzes { get; set; } = new List<Analyze>();

@@ -50,7 +50,7 @@
 
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        Elements = WaterAnalyzeContext.Analyzes.ToList();
+        Elements = WaterAnalyzeContext.Analyzes.Where(x => x.IsDeleted == false).ToList();
     }
 
     public void ToDirectionInfo(int id)

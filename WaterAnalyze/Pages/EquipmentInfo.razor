@@ -1,0 +1,196 @@
+﻿@page "/equipmentInfo"
+@page "/equipmentInfo/{equipmentId}"
+@using Data
+@using Microsoft.JSInterop
+@inject ISnackbar Snackbar
+@inject WaterAnalyzeContext WaterAnalyzeContext
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+  
+<MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; align-self: center; align-items: center; justify-content: center;">
+    <MudCard Elevation="0" Style="flex: 50%; border-radius: 10px; padding: 10px">
+        <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
+    </MudCard>
+	<div Style="flex: 50%; ">
+        <MudText Style="font-size: 18px; text-align: center; margin: 10px">
+            Оборудование
+        </MudText>
+        <MudText Style="font-size: 16px">
+            Наименование:
+        </MudText>
+        <MudTextField T="String" Variant="Variant.Text" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@title" />
+        <MudText Style="font-size: 16px">
+            Дата начала эксплуатации:
+        </MudText>
+        <MudTextField Format="yyyy-MM-dd" InputType="InputType.Date" T="DateTime?" Variant="Variant.Text" Style="font-size: 16px; margin: 0; margin-bottom: 10px" @bind-Value="@dateBegin" />
+        <MudText Style="font-size: 16px">
+            Дата конца эксплуатации:
+        </MudText>
+        <MudTextField Format="yyyy-MM-dd" InputType="InputType.Date" T="DateTime?" Variant="Variant.Text" Style=" font-size: 16px; margin: 0; margin-bottom: 10px " @bind-Value="@dateEnd" />
+        <MudText Style="font-size: 16px; margin: 0">
+            Ответственный:
+        </MudText>
+        <MudSelect T="String" @bind-Value="@workerLogin" Style="font-size: 16px; margin: 0">
+            @foreach (var worker in listOfUsers)
+            {
+                <MudSelectItem Value="@worker.Id.ToString()">
+                    @worker.Surname @worker.Name @worker.Patronymic
+                </MudSelectItem>
+            }
+        </MudSelect>
+        <br>
+        @if (!newOne)
+        {
+            <div Class="d-flex mx-auto" style="display: inline-block;">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" Style="margin: 15px; font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" @onclick="RegistrationEquipment">
+                    Сохранить
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" Style="margin: 15px; font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" @onclick="DeletingEquipment">
+                    Удалить
+                </MudButton>
+            </div>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="d-flex mx-auto" Style="margin: 15px; font-size: 16px; width: 30%; box-shadow: rgb(38, 57, 77) 0px 3px 3px -3px;" @onclick="RegistrationEquipment">
+                Сохранить
+            </MudButton>
+        }
+	</div>
+</MudCard>
+
+@* <MudGrid Style="width: 60%; height: 30%;display: block;margin-left: auto;margin-right: auto; margin-top: 2%;">
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6</MudPaper>
+    </MudItem>
+    
+</MudGrid> *@
+
+
+@code {
+    [Parameter]
+    public string? equipmentId { get; set; }
+
+    Equipment equipment;
+    string? title;
+    string workerLogin;
+    DateTime? dateBegin;
+    DateTime? dateEnd;
+    string? docNumber;
+    bool newOne;
+
+    List<User> listOfUsers;
+
+
+    protected override void OnInitialized()
+    {
+        newOne = true;
+        listOfUsers = WaterAnalyzeContext.Users.Where(x => x.IsDeleted == false).ToList();
+
+        // if (equipmentId != null)
+        // {
+        //     equipment = WaterAnalyzeContext.Equipment.Where(x => x.Id == Convert.ToInt32(equipmentId)).First();
+
+        //     title = equipment.Title;
+        //     dateBegin = equipment.DateBegin;
+        //     dateEnd = equipment.DateEnd;
+        //     workerLogin = equipment.UserId.ToString();
+        //     docNumber = equipment.DocumentNumber;
+
+        //     newOne = false;
+        // }
+
+    }
+
+    public void DeletingEquipment()
+    {
+        // user.IsDeleted = true;
+        // WaterAnalyzeContext.Users.Update(user);
+        // WaterAnalyzeContext.Accounts.Update(account);
+        // WaterAnalyzeContext.SaveChanges();
+
+        // Snackbar.Add("Изменения сохранены", Severity.Success);
+
+        // Navigation.NavigateTo("/workerList");
+    }
+
+
+    public void RegistrationEquipment()
+    {
+        if (equipmentId != null)
+        {
+            // if (surname != null && name != null && password != null)
+            // {
+            //     user.Surname = surname;
+            //     user.Name = name;
+            //     user.Patronymic = patronymic;
+            //     account.Login = login;
+            //     account.Password = password;
+            //     user.RoleId = role;
+
+            //     WaterAnalyzeContext.Users.Update(user);
+            //     WaterAnalyzeContext.Accounts.Update(account);
+            //     WaterAnalyzeContext.SaveChanges();
+            //     // WaterAnalyzeContext.ChangeTracker.Clear();
+
+            //     Snackbar.Add("Изменения сохранены", Severity.Success);
+
+            //     Navigation.NavigateTo("/workerList");
+            // }
+            // else
+            // {
+            //     Snackbar.Add("Не все поля заполнены корректно.", Severity.Error);
+            // }
+        }
+        else
+        {
+            if (title != null && dateBegin != null && dateEnd != null && workerLogin != null && docNumber != null)
+            {
+                if (dateBegin < dateEnd)
+                {
+                    var worker = WaterAnalyzeContext.Users.Where(x => x.Id == Convert.ToInt32(workerLogin)).First();
+
+                    Equipment equipment = new Equipment()
+                        {
+                            Title = title,
+                            User = worker,
+                            DateBegin = (DateTime)dateBegin,
+                            DateEnd = (DateTime)dateEnd,
+                            DocumentNumber = docNumber,
+                            IsDeleted = false
+
+                        };
+
+                    WaterAnalyzeContext.Equipment.Add(equipment);
+                    WaterAnalyzeContext.SaveChanges();
+
+                    Snackbar.Add("Оборудование добавлено", Severity.Success);
+
+                    Navigation.NavigateTo("/equipmentList");
+
+                }
+                else
+                {
+                    Snackbar.Add("Неправильные даты", Severity.Error);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Не все необходимые поля заполнены.", Severity.Error);
+            }
+        }
+    }
+}
+
+<style>
+    body {
+        background-color: #fafafa;
+    }
+</style>

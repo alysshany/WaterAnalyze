@@ -33,6 +33,8 @@ public partial class Analyze
 
     public int? SourceId { get; set; }
 
+    public bool? IsDeleted { get; set; }
+
     public virtual Sample? Sample { get; set; }
 
     public virtual Source? Source { get; set; }

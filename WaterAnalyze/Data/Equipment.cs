@@ -17,5 +17,7 @@ public partial class Equipment
 
     public string? DocumentNumber { get; set; }
 
+    public bool? IsDeleted { get; set; }
+
     public virtual User? User { get; set; }
 }

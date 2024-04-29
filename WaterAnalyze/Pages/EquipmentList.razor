@@ -1,6 +1,8 @@
 ﻿@using Data
 @inject WaterAnalyzeContext WaterAnalyzeContext
 @inject NavigationManager Navigation;
+@inject CurrentUser CurrentUser
+@inject ISnackbar Snackbar
 @page "/equipmentList"
 
 
@@ -21,6 +23,7 @@
                 
                 <MudTextField @bind-Value="searchString1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudSpacer />
+                <MudButton Href="/equipmentInfo" Variant="Variant.Filled" Style="margin-left: auto;margin-right: auto;">Добавить оборудование</MudButton>
             </ToolBarContent>
            @* <HeaderContent>
                 <MudTh>Фамилия</MudTh>
@@ -37,6 +40,10 @@
                                 <MudText Typo="Typo.body2">Регистрация: @context.DateBegin.Value.ToShortDateString()</MudText>
                                 <MudText Typo="Typo.body2">Списание: @context.DateEnd.Value.ToShortDateString()</MudText>
                                 <MudText Typo="Typo.body2">Ответсвенный: @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Surname @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Name @WaterAnalyzeContext.Users.Where(x => x.Id == context.UserId).First().Patronymic</MudText>
+                                @if (CurrentUser.CurrentUserData.RoleId == 1002)
+                                {
+                                    <MudText @onclick="() => DeletingEquipment(context)" Typo="Typo.body2">Удаление: <MudButton>Удалить</MudButton></MudText>
+                                }
                             </MudCardContent>
                         </MudCard>
                     }
@@ -75,7 +82,7 @@
 
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        Elements = WaterAnalyzeContext.Equipment.ToList();
+        Elements = WaterAnalyzeContext.Equipment.Where(x => x.IsDeleted == false).ToList();
     }
 
     private bool FilterFunc1(Equipment element) => FilterFunc(element, searchString1);
@@ -93,6 +100,17 @@
         // if ($"{element.Number} {element.Position} {element.Molar}".Contains(searchString))
         //     return true;
         return false;
+    }
+
+    public void DeletingEquipment(Equipment equipment)
+    {
+        equipment.IsDeleted = true;
+        WaterAnalyzeContext.Equipment.Update(equipment);
+        WaterAnalyzeContext.SaveChanges();
+
+        Snackbar.Add("Изменения сохранены", Severity.Success);
+
+        Navigation.NavigateTo("/equipmentList");
     }
 
 }

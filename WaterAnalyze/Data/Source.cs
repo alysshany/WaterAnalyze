@@ -21,6 +21,8 @@ public partial class Source
 
     public string? CoordinatesY { get; set; }
 
+    public bool? IsDeleted { get; set; }
+
     public virtual ICollection<Analyze> Analyzes { get; set; } = new List<Analyze>();
 
     public virtual Direction? Direction { get; set; }

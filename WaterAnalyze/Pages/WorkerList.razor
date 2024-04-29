@@ -58,7 +58,7 @@
 
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        Elements = WaterAnalyzeContext.Users.ToList();
+        Elements = WaterAnalyzeContext.Users.Where(x => x.IsDeleted == false).ToList();
     }
 
     private bool FilterFunc1(User element) => FilterFunc(element, searchString1);

@@ -14,8 +14,8 @@
         <MudImage Elevation="5" Src='/img/paperOne.jpg' Style="width: 700px; height: 580px; object-fit: fill; border-radius: 10px;"></MudImage>
     </MudCard>
     <div Style="flex: 50%; ">
-        <MudTextField T="string"  Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
-        <MudTextField T="string" InputType=InputType.Password Label="Пароль" Variant="Variant.Outlined" @bind-Value="password"></MudTextField>
+        <MudTextField T="string" Required="true" RequiredError="Введите обязательно" Label="Логин" Variant="Variant.Outlined" @bind-Value="login"></MudTextField>
+        <MudTextField T="string" Required="true" RequiredError="Введите обязательно" InputType=InputType.Password Label="Пароль" Variant="Variant.Outlined" @bind-Value="password"></MudTextField>
         <MudButton Variant="Variant.Outlined" Style="border-radius: 10px;" Color="Color.Primary" Class="d-flex mx-auto" OnClick="ToAutho">Войти</MudButton>
     </div>
 </MudCard>

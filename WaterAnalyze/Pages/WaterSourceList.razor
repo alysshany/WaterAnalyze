@@ -5,15 +5,15 @@
 
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
-    <div Style="flex: 50%;">
-        <MudPaper>
+    <div Style="flex: 50%; overflow: scroll; height: 580px;">
+        <MudPaper >
             <MudTable Style="border-radius: 15px;" Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
                       Items="@Elements"
                       GroupBy="@_groupDefinition"
                       GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
                       GroupFooterClass="mb-4"
                       Dense="true"
-                      @ref="_tableRef">
+                      @ref="_tableRef" >
                 <HeaderContent>
                     <MudTh></MudTh>
                         <MudTh>    </MudTh>

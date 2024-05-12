@@ -2,6 +2,7 @@
 @using Data
 @using Microsoft.JSInterop
 @inject WaterAnalyzeContext WaterAnalyzeContext
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment
 @inject CurrentUser CurrentUser
 @inject IJSRuntime JSRuntime
 
@@ -64,7 +65,7 @@
 	<MudItem xs="12">
 		<div>
 			<MudPaper Class="d-flex mx-auto">
-				<MudText Style="text-align: center; margin: 1%;">Информация по последнему анализу</MudText>
+					<MudText Style="text-align: center; margin: 1%;">Информация по последнему анализу <a href="/files/example.pdf">(Отчет)</a></MudText>
 				@if (CurrentUser.CurrentUserData != null)
 				{
 					if (CurrentUser.CurrentUserData.RoleId == 2)
@@ -72,7 +73,9 @@
 							@* <MudButton Class="d-flex mx-auto" Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px;margin-bottom: 2%;"  Href="/analyzeInfo">Добавить анализ</MudButton> *@
 					}
 				}
-			</MudPaper>
+					
+					@* <MudButton Class="d-flex mx-auto" OnClick="PdfFile" Variant="Variant.Filled" Color="Color.Secondary" Style="color: black; border-radius: 10px; margin-left:5px;margin-bottom: 2%;">Отчет</MudButton> *@
+				</MudPaper>
 			@if (Elements.Count != 0)
 			{
 				<MudTable Elevation="5" Items="@Elements.Take(1)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
@@ -129,6 +132,7 @@
 
 	private bool _hidePosition;
 	private bool _loading;
+	private string pdfPath;
 	private List<Analyze> Elements = new List<Analyze>();
 
 	protected override void OnInitialized()
@@ -136,6 +140,8 @@
 		source = WaterAnalyzeContext.Sources.Where(x => x.Id == Convert.ToInt32(sourceId)).First();
 		Elements = WaterAnalyzeContext.Analyzes.Where(x => x.SourceId == Convert.ToInt32(sourceId)).ToList();
 		Elements.Reverse();
+
+		PdfGenerator.GeneratePdf(source, Elements[0], WaterAnalyzeContext.Directions.Where(x => x.Id == source.DirectionId).First());
 	}
 
 	protected override async System.Threading.Tasks.Task OnAfterRenderAsync(bool firstRender)
@@ -144,8 +150,8 @@
 		{
 			await JSRuntime.InvokeVoidAsync("start", source.CoordinatesX, source.CoordinatesY);
 		}
+		
 	}
-
 
 }
 

@@ -7,6 +7,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
+<PageTitle>Оборудование</PageTitle>
   
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; align-self: center; align-items: center; justify-content: center;">
     <MudCard Elevation="0" Style="flex: 50%; border-radius: 10px; padding: 10px">
@@ -153,7 +154,7 @@
         {
             if (title != null && dateBegin != null && dateEnd != null && workerLogin != null && docNumber != null)
             {
-                if (dateBegin < dateEnd)
+                if (dateBegin < dateEnd || dateBegin > DateTime.Today)
                 {
                     var worker = WaterAnalyzeContext.Users.Where(x => x.Id == Convert.ToInt32(workerLogin)).First();
 

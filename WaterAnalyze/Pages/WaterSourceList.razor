@@ -3,17 +3,25 @@
 @inject NavigationManager Navigation;
 @page "/sourceList"
 
+<PageTitle>Направления</PageTitle>
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%;">
     <div Style="flex: 50%; overflow: scroll; height: 580px;">
         <MudPaper >
             <MudTable Style="border-radius: 15px;" Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
+                      @bind-SelectedItems="selectedItems"
                       Items="@Elements"
                       GroupBy="@_groupDefinition"
                       GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
                       GroupFooterClass="mb-4"
                       Dense="true"
+                      MultiSelection="true"
                       @ref="_tableRef" >
+                <ToolBarContent>
+                    @* <MudText Typo="Typo.h6">Periodic Elements</MudText> *@
+
+                    <MudButton Variant="Variant.Filled" OnClick="PDF" Style="margin-left: auto;margin-right: auto;"><a href="/files/example.pdf">Сформировать отчет </a></MudButton>
+                </ToolBarContent>
                 <HeaderContent>
                     <MudTh></MudTh>
                         <MudTh>    </MudTh>
@@ -57,6 +65,7 @@
 </MudCard>
 
 @code {
+    private HashSet<Source> selectedItems = new HashSet<Source>();
     private MudTable<Source> _tableRef;
 
     private  TableGroupDefinition<Source> _groupDefinition = new()
@@ -78,6 +87,12 @@
     public void ToDirectionInfo(int id)
     {
         Navigation.NavigateTo($"/sourceInfo/{id}");
+    }
+
+    public void PDF()
+    {
+        PdfGenerator.GenerateMany(WaterAnalyzeContext, selectedItems);
+
     }
 }
 

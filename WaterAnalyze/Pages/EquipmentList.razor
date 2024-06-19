@@ -5,6 +5,7 @@
 @inject ISnackbar Snackbar
 @page "/equipmentList"
 
+<PageTitle>Оборудования</PageTitle>
 
 <MudCard Elevation="5" Style="display: flex; width: 90%; border-radius: 15px; margin-left: auto;margin-right: auto; margin-top: 1%; ">
     <MudCard Elevation="0" Style="flex: 30%; border-radius: 10px; padding: 10px">
@@ -23,7 +24,10 @@
                 
                 <MudTextField @bind-Value="searchString1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudSpacer />
-                <MudButton Href="/equipmentInfo" Variant="Variant.Filled" Style="margin-left: auto;margin-right: auto;">Добавить оборудование</MudButton>
+                @if (CurrentUser.CurrentUserData.RoleId == 1002)
+                {
+                    <MudButton Href="/equipmentInfo" Variant="Variant.Filled" Style="margin-left: auto;margin-right: auto;">Добавить оборудование</MudButton>
+                }
             </ToolBarContent>
            @* <HeaderContent>
                 <MudTh>Фамилия</MudTh>
